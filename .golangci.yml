@@ -3,15 +3,54 @@ version: '2'
 linters:
   default: all
   enable:
-    - govet
     - errcheck
+    - govet
+    - staticcheck
     - unused
+    - ineffassign
+    - asasalint
+    - bodyclose
+    - dupl
+    - durationcheck
+    - errname
+    - exptostd
+    - gosec
+    - importas
+    - iface
+    - intrange
+    - lll
+    - musttag
+    - nestif
+    - nilerr
+    - nilnil
+    - noctx
+    - perfsprint
+    - prealloc
+    - reassign
+    - recvcheck
+    - rowserrcheck
+    - sqlclosecheck
+    - thelper
+    - usestdlibvars
+    - wrapcheck
+    - gocritic
+    - nilaway
   settings:
     errcheck:
       check-type-assertions: true
       check-blank: true
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - performance
+        - style
     govet:
       enable-all: true
+    custom:
+      nilaway:
+        type: module
+        settings:
+          include-pkgs: ''
       
 formatters:
   enable:
@@ -35,3 +74,7 @@ run:
 
 severity:
   default: error
+  rules:
+    - severity: warning
+      linters:
+        - dupl
