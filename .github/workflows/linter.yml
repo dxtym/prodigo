@@ -40,4 +40,4 @@ jobs:
 
       - name: Run custom linter
         run: |
-          ./bin/custom-gcl run ./... --timeout=10min
+          ./bin/custom-gcl run ./... --timeout=10m
