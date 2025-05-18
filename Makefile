@@ -18,4 +18,10 @@ test:
 	go tool cover -html data/coverage.out.tmp -o data/coverage.html
 	open data/coverage.html
 
-.PHONY: gcl lint auth app test
+up:
+	cd deployments && docker-compose up -d
+
+down:
+	cd deployments && docker-compose down
+
+.PHONY: gcl lint auth app test up down

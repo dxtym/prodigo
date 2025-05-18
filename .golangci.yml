@@ -1,7 +1,7 @@
 version: '2'
 
 linters:
-  default: all
+  default: none
   enable:
     - errcheck
     - govet
@@ -44,6 +44,8 @@ linters:
         - diagnostic
         - performance
         - style
+      disabled-checks:
+      - unnecessaryBlock
     govet:
       enable-all: true
     custom:

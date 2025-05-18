@@ -1,0 +1,21 @@
+package db
+
+import (
+	"context"
+	"prodigo/pkg/config"
+	"prodigo/pkg/db/postgres"
+	"prodigo/pkg/db/redis"
+
+	"go.uber.org/fx"
+)
+
+var Module = fx.Module("db",
+	fx.Provide(
+		func(conf *config.AuthConfig) (postgres.Pool, error) {
+			return postgres.New(context.Background(), conf.Postgres)
+		},
+		func(conf *config.AuthConfig) (redis.Client, error) {
+			return redis.New(context.Background(), conf.RedisAddr, conf.RedisPass)
+		},
+	),
+)
