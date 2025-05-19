@@ -13,7 +13,7 @@ var Module = fx.Module("rest",
 	fx.Invoke(func(lc fx.Lifecycle, s *Server, conf *config.Config) {
 		lc.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
-				if err := s.Start(conf.Host, conf.Port); err != nil {
+				if err := s.Start(conf.AuthHost, conf.AuthPort); err != nil {
 					return fmt.Errorf("failed to start server: %w", err)
 				}
 				return nil

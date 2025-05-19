@@ -7,8 +7,8 @@ import (
 )
 
 type Config struct {
-	Host        string `mapstructure:"AUTH_HOST"`
-	Port        string `mapstructure:"AUTH_PORT"`
+	AuthHost        string `mapstructure:"AUTH_HOST"`
+	AuthPort        string `mapstructure:"AUTH_PORT"`
 	RedisAddr   string `mapstructure:"REDIS_ADDR"`
 	RedisPass   string `mapstructure:"REDIS_PASS"`
 	PostgresDSN string `mapstructure:"POSTGRES_DSN"`
