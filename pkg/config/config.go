@@ -6,18 +6,19 @@ import (
 	"github.com/spf13/viper"
 )
 
-type AuthConfig struct {
-	Host      string `mapstructure:"HOST"`
-	Port      string `mapstructure:"PORT"`
-	Postgres  string `mapstructure:"POSTGRES_DSN"`
-	RedisAddr string `mapstructure:"REDIS_ADDR"`
-	RedisPass string `mapstructure:"REDIS_PASS"`
-	Secret    string `mapstructure:"SECRET_KEY"`
+type Config struct {
+	AuthHost    string `mapstructure:"AUTH_HOST"`
+	AuthPort    string `mapstructure:"AUTH_PORT"`
+	RedisAddr   string `mapstructure:"REDIS_ADDR"`
+	RedisPass   string `mapstructure:"REDIS_PASS"`
+	PostgresDSN string `mapstructure:"POSTGRES_DSN"`
+	MigrateURL  string `mapstructure:"MIGRATE_URL"`
+	Secret      string `mapstructure:"SECRET_KEY"`
 }
 
-func LoadAuthConfig() (*AuthConfig, error) {
+func LoadAuthConfig() (*Config, error) {
 	viper.AddConfigPath("configs")
-	viper.SetConfigName("auth")
+	viper.SetConfigName("config")
 	viper.SetConfigType("env")
 
 	viper.AutomaticEnv()
@@ -26,7 +27,7 @@ func LoadAuthConfig() (*AuthConfig, error) {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
 
-	conf := &AuthConfig{}
+	conf := &Config{}
 	if err := viper.Unmarshal(conf); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}

@@ -9,6 +9,8 @@ import (
 	"prodigo/pkg/db"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"go.uber.org/fx"
 )
 
@@ -21,8 +23,5 @@ func main() {
 		handlers.Module,
 		rest.Module,
 		fx.Provide(gin.New),
-		fx.Invoke(func(srv *rest.Server, cfg *config.AuthConfig) error {
-			return srv.Start(cfg.Host, cfg.Port)
-		}),
 	).Run()
 }
