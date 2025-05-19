@@ -16,7 +16,7 @@ type Config struct {
 	Secret      string `mapstructure:"SECRET_KEY"`
 }
 
-func LoadAuthConfig() (*Config, error) {
+func LoadConfig() (*Config, error) {
 	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
 	viper.SetConfigType("env")
