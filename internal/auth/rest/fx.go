@@ -19,7 +19,10 @@ var Module = fx.Module("rest",
 				return nil
 			},
 			OnStop: func(ctx context.Context) error {
-				return s.Stop(ctx)
+				if err := s.Stop(ctx); err != nil {
+					return fmt.Errorf("failed to stop server: %w", err)
+				}
+				return nil
 			},
 		})
 	}),
