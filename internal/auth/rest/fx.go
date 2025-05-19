@@ -2,7 +2,7 @@ package rest
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"prodigo/pkg/config"
 
 	"go.uber.org/fx"
@@ -13,11 +13,9 @@ var Module = fx.Module("rest",
 	fx.Invoke(func(lc fx.Lifecycle, s *Server, conf *config.Config) {
 		lc.Append(fx.Hook{
 			OnStart: func(ctx context.Context) error {
-				go func() {
-					if err := s.Start(conf.Host, conf.Port); err != nil {
-						log.Fatalf("failed to start server: %v", err)
-					}
-				}()
+				if err := s.Start(conf.Host, conf.Port); err != nil {
+					return fmt.Errorf("failed to start server: %w", err)
+				}
 				return nil
 			},
 			OnStop: func(ctx context.Context) error {

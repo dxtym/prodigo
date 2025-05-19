@@ -17,9 +17,5 @@ func migrateDB(source, destination string) error {
 		return fmt.Errorf("failed to apply migrations: %w", err)
 	}
 
-	if srcErr, dstErr := mg.Close(); srcErr != nil || dstErr != nil {
-		return fmt.Errorf("failed to close migration instance: srcErr=%v, dstErr=%v", srcErr, dstErr)
-	}
-
 	return nil
 }
