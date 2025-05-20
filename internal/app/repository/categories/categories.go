@@ -3,7 +3,6 @@ package categories
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"prodigo/internal/app/models"
 	"prodigo/pkg/db/postgres"
@@ -40,12 +39,16 @@ CREATE TABLE IF NOT EXISTS categories (
 }
 
 func (r *repository) CreateCategory(ctx context.Context, c *models.Category) error {
-	return r.pool.QueryRow(ctx,
+	err := r.pool.QueryRow(ctx,
 		`INSERT INTO categories (name) 
 		 VALUES ($1) 
 		 RETURNING id, created_at, updated_at`,
 		c.Name,
 	).Scan(&c.ID, &c.CreatedAt, &c.UpdatedAt)
+	if err != nil {
+		return errors.New("failed to create category")
+	}
+	return nil
 }
 
 func (r *repository) UpdateCategory(ctx context.Context, c *models.Category) error {
@@ -56,10 +59,10 @@ func (r *repository) UpdateCategory(ctx context.Context, c *models.Category) err
 		c.Name, c.ID,
 	)
 	if err != nil {
-		return err
+		return errors.New("failed to update category")
 	}
 	if cmd.RowsAffected() == 0 {
-		return fmt.Errorf("category not found or deleted")
+		return errors.New("category not found or deleted")
 	}
 	return nil
 }
@@ -71,7 +74,7 @@ func (r *repository) GetAllCategories(ctx context.Context) ([]*models.Category, 
 		 WHERE deleted_at IS NULL`,
 	)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("failed to get all categories")
 	}
 	defer rows.Close()
 
@@ -94,10 +97,10 @@ func (r *repository) DeleteCategory(ctx context.Context, id int64) error {
 		id,
 	)
 	if err != nil {
-		return err
+		return errors.New("failed to delete/archive category")
 	}
 	if cmd.RowsAffected() == 0 {
-		return fmt.Errorf("category not found or deleted")
+		return errors.New("category not found or deleted")
 	}
 	return nil
 }

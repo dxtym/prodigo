@@ -50,7 +50,7 @@ func Test_repository_CreateCategory(t *testing.T) {
 		err := repo.CreateCategory(context.Background(), category)
 
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "insert error")
+		assert.Contains(t, err.Error(), "failed to create category")
 
 	})
 	t.Run("success on insert", func(t *testing.T) {
@@ -167,7 +167,7 @@ func Test_repository_UpdateCategory(t *testing.T) {
 		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(tag, errors.New("exec error"))
 		err := repo.UpdateCategory(ctx, &models.Category{ID: 1})
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "exec error")
+		assert.Contains(t, err.Error(), "failed to update category")
 	})
 }
 
@@ -197,7 +197,7 @@ func Test_repository_DeleteCategory(t *testing.T) {
 
 		err := repo.DeleteCategory(ctx, 1)
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "exec error")
+		assert.Contains(t, err.Error(), "failed to delete/archive category")
 	})
 	t.Run("not found cat or deleted", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)

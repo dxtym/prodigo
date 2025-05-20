@@ -171,12 +171,12 @@ func (h *Handler) UploadProductImage(c *gin.Context) {
 	}
 
 	defer func() {
-		if err := dst.Close(); err != nil {
+		if err = dst.Close(); err != nil {
 			fmt.Println("Error closing file dst:", err)
 		}
 	}()
 
-	if _, err := io.Copy(dst, file); err != nil {
+	if _, err = io.Copy(dst, file); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save file"})
 		return
 	}

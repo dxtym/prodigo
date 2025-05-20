@@ -15,4 +15,4 @@ services:
       - POSTGRES_PASSWORD=pass
       - POSTGRESS_DB=prodigo
     ports:
-      - '5432:5432'
+      - '5434:5432'
