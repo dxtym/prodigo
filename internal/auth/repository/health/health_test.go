@@ -14,8 +14,8 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	pool := postgres.NewMockPool(t)
-	client := rdb.NewMockClient(t)
+	pool := new(postgres.MockPool)
+	client := new(rdb.MockClient)
 
 	repository := health.New(pool, client)
 
@@ -23,10 +23,10 @@ func TestNew(t *testing.T) {
 }
 
 func TestRepository_Check(t *testing.T) {
-	pool := postgres.NewMockPool(t)
-	pool.EXPECT().Ping(mock.Anything).Return(nil)
-	client := rdb.NewMockClient(t)
-	client.EXPECT().Ping(mock.Anything).Return(&redis.StatusCmd{})
+	pool := new(postgres.MockPool)
+	pool.On("Ping", mock.Anything).Return(nil)
+	client := new(rdb.MockClient)
+	client.On("Ping", mock.Anything).Return(&redis.StatusCmd{})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
