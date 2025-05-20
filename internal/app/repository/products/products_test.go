@@ -3,6 +3,7 @@ package products
 import (
 	"context"
 	"errors"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -36,138 +37,228 @@ func TestNew(t *testing.T) {
 }
 
 func Test_repository_CreateProduct(t *testing.T) {
-	t.Run("success on create product", func(t *testing.T) {
-		mockRepo := new(MockRepo)
+	t.Run("error on insert", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		mockRow := new(postgres.MockRow)
 
-		p := &models.Product{
+		product := &models.Product{
 			Title:      "Test Product",
 			CategoryID: 1,
 			Price:      100,
 			Quantity:   10,
 			Image:      "",
-			Status:     "available",
+			Status:     "active",
 		}
 
-		mockRepo.On("CreateProduct", mock.Anything, p).Return(nil)
+		mockPool.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
+		mockRow.On("Scan", mock.Anything).Return(errors.New("insert error"))
 
-		err := mockRepo.CreateProduct(context.Background(), p)
-
-		assert.NoError(t, err)
-		mockRepo.AssertExpectations(t)
-	})
-	t.Run("error on create product", func(t *testing.T) {
-		mockRepo := new(MockRepo)
-		p := &models.Product{}
-
-		mockRepo.On("CreateProduct", mock.Anything, p).Return(errors.New("db error"))
-
-		err := mockRepo.CreateProduct(context.Background(), p)
+		repo := &repository{pool: mockPool}
+		err := repo.CreateProduct(context.Background(), product)
 
 		assert.Error(t, err)
-		assert.EqualError(t, err, "db error")
-		mockRepo.AssertExpectations(t)
+		assert.Contains(t, err.Error(), "failed to create product")
+
+		mockPool.AssertExpectations(t)
+		mockRow.AssertExpectations(t)
+	})
+	t.Run("success on insert", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		mockRow := new(postgres.MockRow)
+
+		product := &models.Product{}
+
+		mockPool.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
+		mockRow.On("Scan", mock.Anything).Return(nil)
+
+		repo := &repository{pool: mockPool}
+		err := repo.CreateProduct(context.Background(), product)
+
+		assert.NoError(t, err)
+
+		mockPool.AssertExpectations(t)
+		mockRow.AssertExpectations(t)
 	})
 }
 
-func Test_repository_GetAllProducts(t *testing.T) {
-	t.Run("success on get all products", func(t *testing.T) {
-		mockRepo := new(MockRepo)
+func TestRepository_GetProductByID(t *testing.T) {
+	t.Run("error on get product by id", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		mockRow := new(postgres.MockRow)
+		defer mockPool.AssertExpectations(t)
+		defer mockRow.AssertExpectations(t)
 
-		expected := []*models.Product{
-			{ID: 1, Title: "Product 1"},
-			{ID: 2, Title: "Product 2"},
-		}
-		mockRepo.On("GetAllProducts", mock.Anything).Return(expected, nil)
+		pool := &repository{pool: mockPool}
 
-		products, err := mockRepo.GetAllProducts(context.Background())
+		mockPool.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).
+			Return(mockRow)
+		mockRow.On("Scan", mock.Anything, mock.Anything, mock.Anything, mock.Anything,
+			mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(pgx.ErrNoRows)
 
-		assert.NoError(t, err)
-		assert.Equal(t, expected, products)
-		mockRepo.AssertExpectations(t)
+		task, err := pool.GetProductByID(context.Background(), 1)
+		assert.NotNil(t, err)
+		assert.Nil(t, task)
 	})
-	t.Run("error on get all products", func(t *testing.T) {
-		mockRepo := new(MockRepo)
+	t.Run("success on get product by id", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		mockRow := new(postgres.MockRow)
+		defer mockPool.AssertExpectations(t)
+		defer mockRow.AssertExpectations(t)
 
-		mockRepo.On("GetAllProducts", mock.Anything).Return([]*models.Product(nil), errors.New("db error"))
+		pool := &repository{pool: mockPool}
 
-		products, err := mockRepo.GetAllProducts(context.Background())
+		mockPool.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).
+			Return(mockRow)
+		mockRow.On("Scan", mock.Anything, mock.Anything, mock.Anything, mock.Anything,
+			mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
+		task, err := pool.GetProductByID(context.Background(), 1)
+		assert.Nil(t, err)
+		assert.NotNil(t, task)
+	})
+	t.Run("error on get task by id", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		mockRow := new(postgres.MockRow)
+		defer mockPool.AssertExpectations(t)
+		defer mockRow.AssertExpectations(t)
+
+		pool := &repository{pool: mockPool}
+
+		mockPool.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).
+			Return(mockRow)
+		mockRow.On("Scan", mock.Anything, mock.Anything, mock.Anything, mock.Anything,
+			mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(errors.New("error"))
+
+		task, err := pool.GetProductByID(context.Background(), 1)
+		assert.NotNil(t, err)
+		assert.Nil(t, task)
+	})
+}
+
+func TestRepository_GetAllProducts(t *testing.T) {
+	t.Run("success on get all products", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		mockRows := new(postgres.MockRow)
+
+		defer mockPool.AssertExpectations(t)
+		defer mockRows.AssertExpectations(t)
+
+		repo := &repository{pool: mockPool}
+
+		mockPool.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+
+		mockRows.On("Next").Return(true).Once()
+		mockRows.On("Scan", mock.Anything, mock.Anything, mock.Anything, mock.Anything,
+			mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil).Once()
+
+		mockRows.On("Next").Return(false).Once()
+		mockRows.On("Close").Return()
+
+		products, err := repo.GetAllProducts(context.Background())
+		assert.NoError(t, err)
+		assert.Len(t, products, 1)
+	})
+	t.Run("query error", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		mockRows := new(postgres.MockRow)
+
+		defer mockPool.AssertExpectations(t)
+
+		repo := &repository{pool: mockPool}
+
+		mockPool.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, errors.New("query failed"))
+
+		products, err := repo.GetAllProducts(context.Background())
 		assert.Error(t, err)
 		assert.Nil(t, products)
-		mockRepo.AssertExpectations(t)
 	})
-	t.Run("empty products", func(t *testing.T) {
-		mockRepo := new(MockRepo)
-		mockRepo.On("GetAllProducts", mock.Anything).Return([]*models.Product(nil), nil)
-		products, err := mockRepo.GetAllProducts(context.Background())
-		assert.NoError(t, err)
-		assert.Equal(t, []*models.Product(nil), products)
-		mockRepo.AssertExpectations(t)
+	t.Run("scan error", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		mockRows := new(postgres.MockRow)
+
+		defer mockPool.AssertExpectations(t)
+		defer mockRows.AssertExpectations(t)
+
+		repo := &repository{pool: mockPool}
+
+		mockPool.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
+		mockRows.On("Next").Return(true).Once()
+		mockRows.On("Scan", mock.Anything, mock.Anything, mock.Anything, mock.Anything,
+			mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(errors.New("scan failed")).Once()
+		mockRows.On("Close").Return()
+
+		products, err := repo.GetAllProducts(context.Background())
+		assert.Error(t, err)
+		assert.Nil(t, products)
 	})
 }
 
-func Test_repository_GetProductByID(t *testing.T) {
-	t.Run("success on get product by id", func(t *testing.T) {
-		mockRepo := new(MockRepo)
+func TestRepository_UpdateProduct(t *testing.T) {
 
-		expected := &models.Product{ID: 1, Title: "Product 1"}
-		mockRepo.On("GetProductByID", mock.Anything, int64(1)).Return(expected, nil)
+	t.Run("success", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
 
-		product, err := mockRepo.GetProductByID(context.Background(), 1)
+		repo := &repository{pool: mockPool}
+
+		ctx := context.Background()
+		tag := pgconn.NewCommandTag("UPDATE 1")
+		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(tag, nil)
+
+		err := repo.UpdateProduct(ctx, &models.Product{ID: 1})
 		assert.NoError(t, err)
-		assert.Equal(t, expected, product)
-		mockRepo.AssertExpectations(t)
 	})
-	t.Run("error on get product by id", func(t *testing.T) {
-		mockRepo := new(MockRepo)
-		mockRepo.On("GetProductByID", mock.Anything, int64(1)).Return((*models.Product)(nil), errors.New("not found"))
-		product, err := mockRepo.GetProductByID(context.Background(), int64(1))
+
+	t.Run("not found", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+
+		repo := &repository{pool: mockPool}
+
+		ctx := context.Background()
+		tag := pgconn.NewCommandTag("UPDATE 0")
+		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(tag, nil)
+
+		err := repo.UpdateProduct(ctx, &models.Product{ID: 2})
+		assert.EqualError(t, err, "product not found")
+	})
+
+	t.Run("exec error", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+
+		repo := &repository{pool: mockPool}
+
+		ctx := context.Background()
+		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.CommandTag{}, errors.New("some error"))
+
+		err := repo.UpdateProduct(ctx, &models.Product{ID: 3})
 		assert.Error(t, err)
-		assert.Nil(t, product)
-		mockRepo.AssertExpectations(t)
-	})
-	t.Run("not found product", func(t *testing.T) {
-		mockRepo := new(MockRepo)
-		mockRepo.On("GetProductByID", mock.Anything, int64(1)).Return((*models.Product)(nil), nil)
-		product, err := mockRepo.GetProductByID(context.Background(), int64(1))
-		assert.NoError(t, err)
-		assert.Nil(t, product)
-		mockRepo.AssertExpectations(t)
 	})
 }
 
-func Test_repository_UpdateProduct(t *testing.T) {
-	t.Run("success on update product", func(t *testing.T) {
-		mockRepo := new(MockRepo)
-		p := &models.Product{ID: 1, Title: "Product 1"}
-		mockRepo.On("UpdateProduct", mock.Anything, p).Return(nil)
-		err := mockRepo.UpdateProduct(context.Background(), p)
-		assert.NoError(t, err)
-		mockRepo.AssertExpectations(t)
-	})
-	t.Run("error on update product", func(t *testing.T) {
-		mockRepo := new(MockRepo)
-		p := &models.Product{}
-		mockRepo.On("UpdateProduct", mock.Anything, p).Return(errors.New("update error"))
-		err := mockRepo.UpdateProduct(context.Background(), p)
-		assert.Error(t, err)
-		assert.EqualError(t, err, "update error")
-	})
-}
+func TestRepository_DeleteProduct(t *testing.T) {
+	t.Run("success delete", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
 
-func Test_repository_DeleteProduct(t *testing.T) {
-	t.Run("success on delete product", func(t *testing.T) {
-		mockRepo := new(MockRepo)
-		mockRepo.On("DeleteProduct", mock.Anything, int64(1)).Return(nil)
-		err := mockRepo.DeleteProduct(context.Background(), 1)
+		repo := &repository{pool: mockPool}
+		ctx := context.Background()
+		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.NewCommandTag("DELETE 1"), nil)
+
+		err := repo.DeleteProduct(ctx, 1)
 		assert.NoError(t, err)
-		mockRepo.AssertExpectations(t)
 	})
-	t.Run("error on delete product", func(t *testing.T) {
-		mockRepo := new(MockRepo)
-		mockRepo.On("DeleteProduct", mock.Anything, int64(1)).Return(errors.New("delete error"))
-		err := mockRepo.DeleteProduct(context.Background(), 1)
+	t.Run("not found", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		repo := &repository{pool: mockPool}
+		ctx := context.Background()
+		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.NewCommandTag("DELETE 0"), nil)
+		err := repo.DeleteProduct(ctx, 2)
+		assert.EqualError(t, err, "product not found")
+	})
+	t.Run("exec error", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		repo := &repository{pool: mockPool}
+		ctx := context.Background()
+		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.CommandTag{}, errors.New("some error"))
+		err := repo.DeleteProduct(ctx, 3)
 		assert.Error(t, err)
-		assert.EqualError(t, err, "delete error")
 	})
 }
