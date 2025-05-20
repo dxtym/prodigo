@@ -1,0 +1,18 @@
+version: '3.8'
+name: prodigo
+
+services:
+  redis:
+    image: 'redis:alpine'
+    restart: always
+    ports:
+      - '6379:6379'
+  postgres:
+    image: 'postgres:alpine'
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRESS_DB=prodigo
+    ports:
+      - '5432:5432'

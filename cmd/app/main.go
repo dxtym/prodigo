@@ -20,6 +20,6 @@ func main() {
 		handlers.Module,
 		rest.Module,
 		fx.Provide(gin.New),
-		fx.Invoke(func(srv *rest.Server, cfg *config.AuthConfig) error { return srv.Start(cfg.Host, cfg.Port) }),
+		fx.Invoke(func(srv *rest.Server, cfg *config.Config) error { return srv.Start(cfg.AuthHost, cfg.AuthPort) }),
 	).Run()
 }

@@ -2,7 +2,7 @@ package health_test
 
 import (
 	"context"
-	healthRepository "prodigo/internal/auth/repository/health"
+	"prodigo/internal/auth/repository/health"
 	healthService "prodigo/internal/auth/usecases/health"
 	"testing"
 	"time"
@@ -12,7 +12,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	repository := healthRepository.NewMockRepository(t)
+	repository := new(health.MockRepository)
 
 	service := healthService.New(repository)
 
@@ -20,8 +20,8 @@ func TestNew(t *testing.T) {
 }
 
 func TestService_Check(t *testing.T) {
-	repository := healthRepository.NewMockRepository(t)
-	repository.EXPECT().Check(mock.Anything).Return(nil)
+	repository := new(health.MockRepository)
+	repository.On("Check", mock.Anything).Return(nil)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

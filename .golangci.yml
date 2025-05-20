@@ -53,6 +53,9 @@ linters:
         type: module
         settings:
           include-pkgs: ''
+  exclusions:
+    paths:
+      - '^.*\/mock.go$'
       
 formatters:
   enable:
