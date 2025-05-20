@@ -1,0 +1,61 @@
+POST http://localhost:8080/api/v1/categories
+Content-Type: application/json
+
+{
+  "name": "Электроника"
+}
+
+###
+
+POST http://localhost:8080/api/v1/products
+Content-Type: application/json
+
+{
+  "title": "Laptop",
+  "price": 140000,
+  "quantity": 5,
+  "category_id": 1,
+  "status": "available"
+}
+
+###
+GET http://localhost:8080/api/v1/products
+
+###
+GET http://localhost:8080/api/v1/products/1
+
+###
+DELETE http://localhost:8080/api/v1/products/1
+
+###
+
+PUT http://localhost:8080/api/v1/products/1
+Content-Type: application/json
+
+{
+  "title": "Новый заголовок 2"
+}
+
+###
+
+PUT http://localhost:8080/api/v1/products/1/status
+Content-Type: application/json
+
+{
+  "status": "снова в продаже"
+}
+
+###
+POST http://localhost:8080/api/v1/products/1/image
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="image"; filename="test.jpg"
+Content-Type: image/jpeg
+
+< test.jpg
+--WebAppBoundary--
+
+###
+
+GET http://localhost:8080/api/v1/products/1/image

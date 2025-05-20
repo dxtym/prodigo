@@ -74,7 +74,14 @@ func (h *Handler) UpdateProduct(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, p)
+
+	updatedProduct, err := h.service.GetProduct(c.Request.Context(), id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
+		return
+	}
+	c.JSON(http.StatusOK, updatedProduct)
+
 }
 
 func (h *Handler) DeleteProduct(c *gin.Context) {
@@ -107,7 +114,7 @@ func (h *Handler) UpdateProductStatus(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, gin.H{"message": "status updated"})
 }
 
 const uploadDir = "./uploads/products"

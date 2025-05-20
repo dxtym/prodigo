@@ -24,10 +24,11 @@ func (s *Service) CreateProduct(ctx context.Context, p *models.Product) error {
 }
 
 func (s *Service) GetAllProducts(ctx context.Context) ([]*models.Product, error) {
-	if _, err := s.repository.GetAllProducts(ctx); err != nil {
+	prods, err := s.repository.GetAllProducts(ctx)
+	if err != nil {
 		return nil, errors.New("failed to get all products")
 	}
-	return nil, nil
+	return prods, nil
 }
 
 func (s *Service) GetProduct(ctx context.Context, id int64) (*models.Product, error) {
@@ -40,7 +41,33 @@ func (s *Service) GetProduct(ctx context.Context, id int64) (*models.Product, er
 }
 
 func (s *Service) UpdateProduct(ctx context.Context, p *models.Product) error {
-	if err := s.repository.UpdateProduct(ctx, p); err != nil {
+	update, err := s.repository.GetProductByID(ctx, p.ID)
+
+	if err != nil {
+		return fmt.Errorf("product not found: %w", err)
+	}
+
+	if p.Title != "" {
+		update.Title = p.Title
+	}
+	if p.CategoryID != 0 {
+		update.CategoryID = p.CategoryID
+	}
+	if p.Price != 0 {
+		update.Price = p.Price
+	}
+	if p.Quantity != 0 {
+		update.Quantity = p.Quantity
+	}
+	if p.Image != "" {
+		update.Image = p.Image
+	}
+
+	if p.Status != "" {
+		update.Status = p.Status
+	}
+
+	if err = s.repository.UpdateProduct(ctx, update); err != nil {
 		return errors.New("failed to update product")
 	}
 	return nil

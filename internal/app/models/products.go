@@ -4,7 +4,7 @@ import "time"
 
 type Product struct {
 	CreatedAt  time.Time `json:"created_at"`
-	Title      string    `json:"name"`
+	Title      string    `json:"title"`
 	UpdatedAt  time.Time `json:"updated_at"`
 	Image      string    `json:"image"`
 	DeletedAt  time.Time `json:"deleted_at"`
