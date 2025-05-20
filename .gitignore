@@ -37,4 +37,4 @@ go.work
 bin
 *.env
 
-.idea
+.idea/
