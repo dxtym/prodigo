@@ -64,13 +64,13 @@ func (h *Handler) UpdateProduct(c *gin.Context) {
 	}
 
 	var p models.Product
-	if err := c.ShouldBindJSON(&p); err != nil {
+	if err = c.ShouldBindJSON(&p); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	p.ID = id
 
-	if err := h.service.UpdateProduct(c.Request.Context(), &p); err != nil {
+	if err = h.service.UpdateProduct(c.Request.Context(), &p); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
