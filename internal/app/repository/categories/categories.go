@@ -81,8 +81,8 @@ func (r *repository) GetAllCategories(ctx context.Context) ([]*models.Category, 
 	var categories []*models.Category
 	for rows.Next() {
 		var c models.Category
-		if err := rows.Scan(&c.ID, &c.Name, &c.CreatedAt, &c.UpdatedAt, &c.DeletedAt); err != nil {
-			return nil, err
+		if err = rows.Scan(&c.ID, &c.Name, &c.CreatedAt, &c.UpdatedAt, &c.DeletedAt); err != nil {
+			return nil, errors.New("failed to scan category")
 		}
 		categories = append(categories, &c)
 	}
