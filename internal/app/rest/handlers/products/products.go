@@ -110,11 +110,10 @@ func (h *Handler) UpdateProductStatus(c *gin.Context) {
 	var payload struct {
 		Status string `json:"status"`
 	}
-	if err := c.ShouldBindJSON(&payload); err != nil || payload.Status == "" {
+	if err = c.ShouldBindJSON(&payload); err != nil || payload.Status == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid status"})
 		return
 	}
-	
 	err = h.service.UpdateProductStatus(c.Request.Context(), id, payload.Status)
 	if err != nil {
 		if errors.Is(err, products.ErrNotFound) {
