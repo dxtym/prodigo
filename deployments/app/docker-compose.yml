@@ -1,0 +1,13 @@
+version: '3.8'
+name: prodigo_app
+
+services:
+  postgres:
+    image: 'postgres:alpine'
+    restart: always
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=prodigo
+    ports:
+      - '5434:5432'

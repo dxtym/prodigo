@@ -36,3 +36,5 @@ go.work
 # General files and folders
 bin
 *.env
+
+.idea/
