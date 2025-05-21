@@ -3,7 +3,6 @@ package categories
 import (
 	"context"
 	"errors"
-	"log"
 	"prodigo/internal/app/models"
 	"prodigo/pkg/db/postgres"
 )
@@ -31,7 +30,6 @@ CREATE TABLE IF NOT EXISTS categories (
 	if err != nil {
 		return nil, errors.New("failed to create categories table")
 	}
-	log.Println("Categories table created successfully")
 
 	return &repository{
 		pool: pool,
@@ -39,12 +37,12 @@ CREATE TABLE IF NOT EXISTS categories (
 }
 
 func (r *repository) CreateCategory(ctx context.Context, c *models.Category) error {
-	err := r.pool.QueryRow(ctx,
+	_, err := r.pool.Exec(ctx,
 		`INSERT INTO categories (name) 
 		 VALUES ($1) 
 		 RETURNING id, created_at, updated_at`,
 		c.Name,
-	).Scan(&c.ID, &c.CreatedAt, &c.UpdatedAt)
+	)
 	if err != nil {
 		return errors.New("failed to create category")
 	}

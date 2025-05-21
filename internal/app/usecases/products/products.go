@@ -8,6 +8,8 @@ import (
 	"prodigo/internal/app/repository/products"
 )
 
+var ErrNotFound = errors.New("product not found")
+
 type Service struct {
 	repository products.Repository
 }
@@ -34,6 +36,9 @@ func (s *Service) GetAllProducts(ctx context.Context) ([]*models.Product, error)
 func (s *Service) GetProduct(ctx context.Context, id int64) (*models.Product, error) {
 	product, err := s.repository.GetProductByID(ctx, id)
 	if err != nil {
+		if errors.Is(err, products.ErrNotFound) {
+			return nil, ErrNotFound
+		}
 		return nil, errors.New("failed to get product")
 	}
 	return product, nil

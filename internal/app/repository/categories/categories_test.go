@@ -37,16 +37,15 @@ func TestNew(t *testing.T) {
 func Test_repository_CreateCategory(t *testing.T) {
 	t.Run("error on insert", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
-		mockRow := new(postgres.MockRow)
+
 		defer mockPool.AssertExpectations(t)
-		defer mockRow.AssertExpectations(t)
-
-		category := &models.Category{}
-
-		mockPool.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
-		mockRow.On("Scan", mock.Anything, mock.Anything, mock.Anything).Return(errors.New("insert error"))
 
 		repo := &repository{pool: mockPool}
+		category := &models.Category{}
+
+		mockPool.On("Exec", mock.Anything, mock.Anything, mock.Anything).
+			Return(pgconn.CommandTag{}, errors.New("cannot create category"))
+
 		err := repo.CreateCategory(context.Background(), category)
 
 		assert.Error(t, err)
@@ -55,19 +54,14 @@ func Test_repository_CreateCategory(t *testing.T) {
 	})
 	t.Run("success on insert", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
-		mockRow := new(postgres.MockRow)
+
 		defer mockPool.AssertExpectations(t)
-		defer mockRow.AssertExpectations(t)
 
-		category := &models.Category{
-			Name: "Valid Category",
-		}
-
-		mockPool.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
-		mockRow.On("Scan", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+		mockPool.On("Exec", mock.Anything, mock.Anything, mock.Anything).
+			Return(pgconn.NewCommandTag("INSERT 1"), nil)
 
 		repo := &repository{pool: mockPool}
-		err := repo.CreateCategory(context.Background(), category)
+		err := repo.CreateCategory(context.Background(), &models.Category{})
 
 		assert.NoError(t, err)
 	})

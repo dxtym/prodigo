@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5"
 	"prodigo/internal/app/models"
 	"prodigo/internal/app/repository/categories"
 	"prodigo/pkg/db/postgres"
@@ -17,6 +18,8 @@ type Repository interface {
 	DeleteProduct(ctx context.Context, id int64) error
 }
 
+var ErrNotFound = errors.New("product not found")
+
 type repository struct {
 	pool postgres.Pool
 }
@@ -28,9 +31,9 @@ CREATE TABLE IF NOT EXISTS products (
     title TEXT NOT NULL,
     category_id INTEGER references categories(id),
     price INTEGER NOT NULL check (price > 0),
-    quantity INTEGER NOT NULL check ( price > 0 ),
+    quantity INTEGER NOT NULL check ( quantity > 0 ),
     image TEXT,
-    status TEXT NOT NULL DEFAULT 'available',
+    status TEXT NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     deleted_at TIMESTAMP
@@ -44,11 +47,11 @@ CREATE TABLE IF NOT EXISTS products (
 }
 
 func (r *repository) CreateProduct(ctx context.Context, p *models.Product) error {
-	err := r.pool.QueryRow(ctx, `
+	_, err := r.pool.Exec(ctx, `
 		INSERT INTO products (title, category_id, price, quantity, image, status)
 		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id
-`, p.Title, p.CategoryID, p.Price, p.Quantity, p.Image, p.Status).Scan(&p.ID)
+`, p.Title, p.CategoryID, p.Price, p.Quantity, p.Image, p.Status)
 	if err != nil {
 		return errors.New("failed to create product" + err.Error() + "")
 	}
@@ -65,6 +68,9 @@ func (r *repository) GetProductByID(ctx context.Context, id int64) (*models.Prod
 `, id).Scan(&p.ID, &p.Title, &p.CategoryID, &p.Price, &p.Quantity, &p.Image, &p.Status, &p.CreatedAt, &p.UpdatedAt)
 
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrNotFound
+		}
 		return nil, errors.New("failed to get product: " + err.Error() + "")
 	}
 	return &p, nil

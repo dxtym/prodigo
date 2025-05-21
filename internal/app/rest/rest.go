@@ -28,19 +28,25 @@ func (s *Server) SetupRoutes() {
 
 	v1 := s.mux.Group("/api/v1")
 	{
-		v1.POST("/products", s.productHandler.CreateProduct)
-		v1.GET("/products", s.productHandler.GetAllProducts)
-		v1.GET("/products/:id", s.productHandler.GetProductByID)
-		v1.PUT("/products/:id", s.productHandler.UpdateProduct)
-		v1.DELETE("/products/:id", s.productHandler.DeleteProduct)
-		v1.PUT("/products/:id/status", s.productHandler.UpdateProductStatus)
-		v1.POST("/products/:id/image", s.productHandler.UploadProductImage)
-		v1.GET("/products/:id/image", s.productHandler.GetProductImage)
+		prods := v1.Group("/products")
+		{
+			prods.POST("/", s.productHandler.CreateProduct)
+			prods.GET("/", s.productHandler.GetAllProducts)
+			prods.GET("/:id", s.productHandler.GetProductByID)
+			prods.PUT("/:id", s.productHandler.UpdateProduct)
+			prods.DELETE("/:id", s.productHandler.DeleteProduct)
+			prods.PUT("/:id/status", s.productHandler.UpdateProductStatus)
+			prods.POST("/:id/image", s.productHandler.UploadProductImage)
+			prods.GET("/:id/image", s.productHandler.GetProductImage)
+		}
 
-		v1.POST("/categories", s.categoryHandler.CreateCategory)
-		v1.GET("/categories", s.categoryHandler.GetAllCategories)
-		v1.PUT("/categories/:id", s.categoryHandler.UpdateCategory)
-		v1.DELETE("/categories/:id", s.categoryHandler.DeleteCategory)
+		cats := v1.Group("/categories")
+		{
+			cats.POST("/", s.categoryHandler.CreateCategory)
+			cats.GET("/", s.categoryHandler.GetAllCategories)
+			cats.PUT("/:id", s.categoryHandler.UpdateCategory)
+			cats.DELETE("/:id", s.categoryHandler.DeleteCategory)
+		}
 	}
 }
 

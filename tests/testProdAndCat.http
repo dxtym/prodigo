@@ -11,9 +11,9 @@ POST http://localhost:8080/api/v1/products
 Content-Type: application/json
 
 {
-  "title": "Laptop",
-  "price": 140000,
-  "quantity": 5,
+  "title": "Phone",
+  "price": 40000,
+  "quantity": 6,
   "category_id": 1,
   "status": "available"
 }
@@ -24,8 +24,6 @@ GET http://localhost:8080/api/v1/products
 ###
 GET http://localhost:8080/api/v1/products/1
 
-###
-DELETE http://localhost:8080/api/v1/products/1
 
 ###
 

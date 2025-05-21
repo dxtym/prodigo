@@ -39,45 +39,30 @@ func TestNew(t *testing.T) {
 func Test_repository_CreateProduct(t *testing.T) {
 	t.Run("error on insert", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
-		mockRow := new(postgres.MockRow)
-
-		product := &models.Product{
-			Title:      "Test Product",
-			CategoryID: 1,
-			Price:      100,
-			Quantity:   10,
-			Image:      "",
-			Status:     "active",
-		}
-
-		mockPool.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
-		mockRow.On("Scan", mock.Anything).Return(errors.New("insert error"))
-
 		repo := &repository{pool: mockPool}
-		err := repo.CreateProduct(context.Background(), product)
+
+		mockPool.On("Exec", mock.Anything, mock.Anything, mock.Anything).
+			Return(pgconn.CommandTag{}, errors.New("cannot create product"))
+
+		err := repo.CreateProduct(context.Background(), &models.Product{})
 
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "failed to create product")
 
 		mockPool.AssertExpectations(t)
-		mockRow.AssertExpectations(t)
 	})
-	t.Run("success on insert", func(t *testing.T) {
+	t.Run("success on insert product", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
-		mockRow := new(postgres.MockRow)
-
-		product := &models.Product{}
-
-		mockPool.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).Return(mockRow)
-		mockRow.On("Scan", mock.Anything).Return(nil)
+		defer mockPool.AssertExpectations(t)
 
 		repo := &repository{pool: mockPool}
-		err := repo.CreateProduct(context.Background(), product)
+
+		mockPool.On("Exec", mock.Anything, mock.Anything, mock.Anything).
+			Return(pgconn.NewCommandTag("INSERT 1"), nil)
+
+		err := repo.CreateProduct(context.Background(), &models.Product{})
 
 		assert.NoError(t, err)
-
-		mockPool.AssertExpectations(t)
-		mockRow.AssertExpectations(t)
 	})
 }
 

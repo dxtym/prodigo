@@ -1,6 +1,7 @@
 package products
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
@@ -50,7 +51,10 @@ func (h *Handler) GetProductByID(c *gin.Context) {
 	}
 	product, err := h.service.GetProduct(c.Request.Context(), id)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
+		if errors.Is(err, products.ErrNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, product)
@@ -110,7 +114,13 @@ func (h *Handler) UpdateProductStatus(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid status"})
 		return
 	}
-	if err := h.service.UpdateProductStatus(c.Request.Context(), id, payload.Status); err != nil {
+	
+	err = h.service.UpdateProductStatus(c.Request.Context(), id, payload.Status)
+	if err != nil {
+		if errors.Is(err, products.ErrNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
