@@ -22,13 +22,13 @@ func TestHandler_Check(t *testing.T) {
 		wantErr  error
 	}{
 		{
-			name:     "valid",
+			name:     "success",
 			wantCode: http.StatusOK,
 			wantBody: `{"message":"ok"}`,
 			wantErr:  nil,
 		},
 		{
-			name:     "invalid",
+			name:     "internal server error",
 			wantCode: http.StatusInternalServerError,
 			wantBody: `{"error":"some error"}`,
 			wantErr:  errors.New("some error"),

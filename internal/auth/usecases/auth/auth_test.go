@@ -25,7 +25,7 @@ func TestService_Register(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "valid",
+			name: "success",
 			arg: dto.RegisterRequest{
 				Username: utils.GenerateRandomString(10),
 				Password: utils.GenerateRandomString(10),
@@ -33,12 +33,12 @@ func TestService_Register(t *testing.T) {
 			wantErr: nil,
 		},
 		{
-			name: "invalid",
+			name: "invalid create",
 			arg: dto.RegisterRequest{
 				Username: utils.GenerateRandomString(10),
 				Password: utils.GenerateRandomString(10),
 			},
-			wantErr: errors.New("failed to register user"),
+			wantErr: errors.New("some error"),
 		},
 	}
 
@@ -81,7 +81,7 @@ func TestService_Login(t *testing.T) {
 		check func(string, string, error)
 	}{
 		{
-			name: "valid",
+			name: "success",
 			build: func(repository *authRepository.MockRepository) {
 				hashedPassword, err := bcrypt.GenerateFromPassword([]byte(arg.Password), bcrypt.DefaultCost)
 				require.NotEmpty(t, hashedPassword)
@@ -109,7 +109,7 @@ func TestService_Login(t *testing.T) {
 			},
 		},
 		{
-			name: "not found",
+			name: "user not found",
 			build: func(repository *authRepository.MockRepository) {
 				repository.On("GetByUsername",
 					mock.Anything,
@@ -164,12 +164,12 @@ func TestService_Login(t *testing.T) {
 					mock.Anything,
 					mock.Anything,
 					mock.Anything,
-				).Return(errors.New("failed to save token")).Once()
+				).Return(errors.New("some error")).Once()
 			},
 			check: func(accessToken, refreshToken string, err error) {
 				assert.Empty(t, accessToken)
 				assert.Empty(t, refreshToken)
-				assert.ErrorContains(t, err, errors.New("failed to save token").Error())
+				assert.ErrorContains(t, err, errors.New("some error").Error())
 			},
 		},
 	}
@@ -205,7 +205,7 @@ func TestService_Refresh(t *testing.T) {
 		check func(string, error)
 	}{
 		{
-			name: "valid",
+			name: "success",
 			build: func(repository *authRepository.MockRepository, refreshToken string) {
 				repository.On("GetToken",
 					mock.Anything,
@@ -218,7 +218,7 @@ func TestService_Refresh(t *testing.T) {
 			},
 		},
 		{
-			name: "not found",
+			name: "token not found",
 			build: func(repository *authRepository.MockRepository, refreshToken string) {
 				repository.On("GetToken",
 					mock.Anything,

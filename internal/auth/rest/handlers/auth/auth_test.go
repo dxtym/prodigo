@@ -51,7 +51,7 @@ func TestHandler_Register(t *testing.T) {
 				Password: utils.GenerateRandomString(10),
 			},
 			wantCode: http.StatusInternalServerError,
-			wantErr:  errors.New(""),
+			wantErr:  errors.New("some error"),
 		},
 	}
 
@@ -107,7 +107,7 @@ func TestHandler_Login(t *testing.T) {
 			wantErr:  nil,
 		},
 		{
-			name: "not found",
+			name: "user not found",
 			arg: dto.LoginRequest{
 				Username: utils.GenerateRandomString(10),
 				Password: utils.GenerateRandomString(10),
@@ -116,7 +116,7 @@ func TestHandler_Login(t *testing.T) {
 			wantErr:  authService.ErrUserNotFound,
 		},
 		{
-			name: "unauthorized",
+			name: "invalid credentials",
 			arg: dto.LoginRequest{
 				Username: utils.GenerateRandomString(10),
 				Password: utils.GenerateRandomString(10),
@@ -131,7 +131,7 @@ func TestHandler_Login(t *testing.T) {
 				Password: utils.GenerateRandomString(10),
 			},
 			wantCode: http.StatusInternalServerError,
-			wantErr:  errors.New(""),
+			wantErr:  errors.New("some error"),
 		},
 	}
 
@@ -189,7 +189,7 @@ func TestHandler_Refresh(t *testing.T) {
 			wantErr:  nil,
 		},
 		{
-			name: "not found",
+			name: "token not found",
 			arg: dto.RefreshRequest{
 				RefreshToken: utils.GenerateRandomString(10),
 			},
@@ -197,7 +197,7 @@ func TestHandler_Refresh(t *testing.T) {
 			wantErr:  authService.ErrTokenNotFound,
 		},
 		{
-			name: "unauthorized",
+			name: "invalid token",
 			arg: dto.RefreshRequest{
 				RefreshToken: utils.GenerateRandomString(10),
 			},
@@ -210,7 +210,7 @@ func TestHandler_Refresh(t *testing.T) {
 				RefreshToken: utils.GenerateRandomString(10),
 			},
 			wantCode: http.StatusInternalServerError,
-			wantErr:  errors.New(""),
+			wantErr:  errors.New("some error"),
 		},
 	}
 

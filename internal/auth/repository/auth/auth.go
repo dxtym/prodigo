@@ -9,7 +9,7 @@ import (
 	rdb "prodigo/pkg/db/redis"
 	"time"
 
-	"github.com/jackc/pgx"
+	"github.com/jackc/pgx/v5"
 	"github.com/redis/go-redis/v9"
 )
 

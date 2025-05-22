@@ -19,8 +19,8 @@ func TestNew(t *testing.T) {
 		secretKey string
 		wantErr   error
 	}{
-		{name: "valid secret", secretKey: utils.GenerateRandomString(32), wantErr: nil},
-		{name: "invalid secret", secretKey: utils.GenerateRandomString(10), wantErr: maker.ErrInvalidSecretKey},
+		{name: "success", secretKey: utils.GenerateRandomString(32), wantErr: nil},
+		{name: "invalid secret key", secretKey: utils.GenerateRandomString(10), wantErr: maker.ErrInvalidSecretKey},
 	}
 
 	for _, tt := range tests {
@@ -32,7 +32,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestCreateAndVerifyToken(t *testing.T) {
-	t.Run("valid token", func(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
 		secretKey := utils.GenerateRandomString(32)
 		m, err := maker.New(secretKey)
 		require.NotNil(t, m)

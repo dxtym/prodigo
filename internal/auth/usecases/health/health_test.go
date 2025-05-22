@@ -17,8 +17,8 @@ func TestService_Check(t *testing.T) {
 		name    string
 		wantErr error
 	}{
-		{name: "valid", wantErr: nil},
-		{name: "invalid", wantErr: errors.New("some error")},
+		{name: "success", wantErr: nil},
+		{name: "invalid check", wantErr: errors.New("some error")},
 	}
 
 	for _, tt := range tests {

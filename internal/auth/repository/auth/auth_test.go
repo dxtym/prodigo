@@ -27,7 +27,7 @@ func TestRepository_CreateUser(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "valid",
+			name: "success",
 			arg: &models.User{
 				Username: utils.GenerateRandomString(10),
 				Password: utils.GenerateRandomString(10),
@@ -98,13 +98,13 @@ func TestRepository_GetByUsername(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name:    "valid",
+			name:    "success",
 			arg:     utils.GenerateRandomString(10),
 			want:    &models.User{},
 			wantErr: nil,
 		},
 		{
-			name:    "not found",
+			name:    "user not found",
 			arg:     utils.GenerateRandomString(10),
 			want:    nil,
 			wantErr: auth.ErrUserNotFound,
@@ -169,7 +169,7 @@ func TestRepository_SaveToken(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name: "valid",
+			name: "success",
 			arg: arg{
 				key:      utils.GenerateRandomInt(10),
 				value:    utils.GenerateRandomString(10),
@@ -244,13 +244,13 @@ func TestRepository_GetToken(t *testing.T) {
 		wantErr error
 	}{
 		{
-			name:    "valid",
+			name:    "success",
 			arg:     utils.GenerateRandomInt(10),
 			want:    utils.GenerateRandomString(10),
 			wantErr: nil,
 		},
 		{
-			name:    "not found",
+			name:    "token not found",
 			arg:     utils.GenerateRandomInt(10),
 			want:    "",
 			wantErr: auth.ErrTokenNotFound,
