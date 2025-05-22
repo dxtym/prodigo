@@ -18,13 +18,13 @@ type conn struct {
 	*redis.Client
 }
 
-func New(ctx context.Context, addr, pass string) (Client, error) {
-	client := redis.NewClient(&redis.Options{
-		Addr:     addr,
-		Password: pass,
-		DB:       0,
-	})
+func New(ctx context.Context, url string) (Client, error) {
+	opt, err := redis.ParseURL(url)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse redis url: %w", err)
+	}
 
+	client := redis.NewClient(opt)
 	if err := client.Ping(ctx).Err(); err != nil {
 		return nil, fmt.Errorf("failed to ping redis: %w", err)
 	}

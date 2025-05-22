@@ -36,6 +36,8 @@ func (m *MockPool) Exec(ctx context.Context, sql string, arguments ...any) (pgco
 	return called.Get(0).(pgconn.CommandTag), called.Error(1)
 }
 
+var _ Pool = (*MockPool)(nil)
+
 type MockRow struct {
 	mock.Mock
 }
@@ -83,3 +85,5 @@ func (m *MockRow) Scan(dest ...any) error {
 	args := m.Called(dest...)
 	return args.Error(0)
 }
+
+var _ pgx.Row = (*MockRow)(nil)

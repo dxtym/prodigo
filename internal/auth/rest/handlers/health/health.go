@@ -9,10 +9,10 @@ import (
 )
 
 type Handler struct {
-	service *health.Service
+	service health.Service
 }
 
-func New(service *health.Service) *Handler {
+func New(service health.Service) *Handler {
 	return &Handler{service: service}
 }
 
@@ -22,5 +22,5 @@ func (h *Handler) Check(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": "ok"})
+	c.JSON(http.StatusOK, gin.H{"message": "ok"})
 }

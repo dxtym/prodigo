@@ -7,15 +7,19 @@ import (
 	"prodigo/internal/auth/repository/health"
 )
 
-type Service struct {
+type Service interface {
+	Check(context.Context) error
+}
+
+type service struct {
 	repository health.Repository
 }
 
-func New(repository health.Repository) *Service {
-	return &Service{repository: repository}
+func New(repository health.Repository) Service {
+	return &service{repository: repository}
 }
 
-func (s *Service) Check(ctx context.Context) error {
+func (s *service) Check(ctx context.Context) error {
 	if err := s.repository.Check(ctx); err != nil {
 		return fmt.Errorf("failed to check health: %w", err)
 	}

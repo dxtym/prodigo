@@ -13,9 +13,9 @@ app:
 
 test:
 	mkdir -p data
-	go test -v -covermode=atomic -coverprofile=data/coverage.out ./...
+	@/snap/bin/go test -v -covermode=atomic -coverprofile=data/coverage.out ./...
 	grep -v "mock" data/coverage.out > data/coverage.out.tmp
-	go tool cover -html data/coverage.out.tmp -o data/coverage.html
+	@/snap/bin/go tool cover -html data/coverage.out.tmp -o data/coverage.html
 	open data/coverage.html
 
 auth-up:

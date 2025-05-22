@@ -2,7 +2,7 @@ package health_test
 
 import (
 	"prodigo/internal/auth/repository/health"
-	"prodigo/pkg/db/postgres"
+	db "prodigo/pkg/db/postgres"
 	rdb "prodigo/pkg/db/redis"
 	"testing"
 	"time"
@@ -13,26 +13,22 @@ import (
 	"golang.org/x/net/context"
 )
 
-func TestNew(t *testing.T) {
-	pool := new(postgres.MockPool)
-	client := new(rdb.MockClient)
-
-	repository := health.New(pool, client)
-
-	assert.NotNil(t, repository)
-}
-
 func TestRepository_Check(t *testing.T) {
-	pool := new(postgres.MockPool)
-	pool.On("Ping", mock.Anything).Return(nil)
+	pool := new(db.MockPool)
+	defer pool.AssertExpectations(t)
+
 	client := new(rdb.MockClient)
-	client.On("Ping", mock.Anything).Return(&redis.StatusCmd{})
+	defer client.AssertExpectations(t)
+
+	pool.On("Ping", mock.Anything).Return(nil).Once()
+
+	client.On("Ping", mock.Anything).Return(&redis.StatusCmd{}).Once()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	repository := health.New(pool, client)
-	err := repository.Check(ctx)
 
+	err := repository.Check(ctx)
 	assert.NoError(t, err)
 }
