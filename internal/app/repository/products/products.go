@@ -16,6 +16,7 @@ type Repository interface {
 	GetAllProducts(ctx context.Context) ([]*models.Product, error)
 	UpdateProduct(ctx context.Context, p *models.Product) error
 	DeleteProduct(ctx context.Context, id int64) error
+	RestoreProduct(ctx context.Context, id int64) error
 }
 
 var ErrNotFound = errors.New("product not found")
@@ -125,6 +126,19 @@ func (r *repository) DeleteProduct(ctx context.Context, id int64) error {
 		return errors.New("failed to delete product: " + err.Error() + "")
 	}
 	if dlt.RowsAffected() == 0 {
+		return errors.New("product not found")
+	}
+	return nil
+}
+
+func (r *repository) RestoreProduct(ctx context.Context, id int64) error {
+	restore, err := r.pool.Exec(ctx, `
+	UPDATE products SET deleted_at = NULL WHERE id = $1
+`, id)
+	if err != nil {
+		return errors.New("failed to restore product: " + err.Error() + "")
+	}
+	if restore.RowsAffected() == 0 {
 		return errors.New("product not found")
 	}
 	return nil

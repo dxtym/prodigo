@@ -96,3 +96,10 @@ func (s *Service) UpdateProductStatus(ctx context.Context, id int64, status stri
 	}
 	return nil
 }
+
+func (s *Service) RestoreProduct(ctx context.Context, id int64) error {
+	if err := s.repository.RestoreProduct(ctx, id); err != nil {
+		return errors.New("failed to restore product")
+	}
+	return nil
+}

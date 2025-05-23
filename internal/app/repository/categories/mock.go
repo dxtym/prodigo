@@ -30,3 +30,8 @@ func (m *MockRepo) DeleteCategory(ctx context.Context, id int64) error {
 	args := m.Called(ctx, id)
 	return args.Error(0)
 }
+
+func (m *MockRepo) CategoryStatistics(ctx context.Context) ([]*models.CategoryStats, error) {
+	args := m.Called(ctx)
+	return args.Get(0).([]*models.CategoryStats), args.Error(1)
+}
