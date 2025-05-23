@@ -140,6 +140,7 @@ func TestRepository_GetByUsername(t *testing.T) {
 				mock.Anything,
 				mock.Anything,
 				mock.Anything,
+				mock.Anything,
 			).Return(tt.wantErr).Once()
 
 			repository, err := auth.New(pool, client)

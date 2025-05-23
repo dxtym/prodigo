@@ -31,6 +31,7 @@ func New(pool db.Pool, client rdb.Client) (Repository, error) {
 		id BIGSERIAL PRIMARY KEY,
 		username VARCHAR(20) NOT NULL UNIQUE,
 		password VARCHAR(255) NOT NULL,
+		role VARCHAR(10) NOT NULL DEFAULT 'user',
 		created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 		updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
 		deleted_at TIMESTAMP
@@ -67,12 +68,14 @@ func (r *repository) GetByUsername(ctx context.Context, username string) (*model
 	SELECT
 		id,
 		username,
-		password
+		password,
+		role
 	FROM users
 	WHERE username = $1 AND deleted_at IS NULL;`, username).Scan(
 		&user.ID,
 		&user.Username,
 		&user.Password,
+		&user.Role,
 	); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, ErrUserNotFound

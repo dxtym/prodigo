@@ -9,7 +9,7 @@ import (
 var Module = fx.Module("jwt",
 	fx.Provide(
 		func(conf *config.Config) (TokenMaker, error) {
-			return New(conf.SecretKey)
+			return New(conf.AuthSecretKey)
 		},
 	),
 )

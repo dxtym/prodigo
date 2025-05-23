@@ -7,15 +7,20 @@ import (
 )
 
 type Config struct {
-	AuthHost  string `mapstructure:"AUTH_HOST"`
-	AuthPort  string `mapstructure:"AUTH_PORT"`
-	Redis     string `mapstructure:"REDIS"`
-	Postgres  string `mapstructure:"POSTGRES"`
-	SecretKey string `mapstructure:"SECRET_KEY"`
+	AppCasbin     string `mapstructure:"APP_CASBIN"`
+	AppPolicy     string `mapstructure:"APP_POLICY"`
+	AppHost       string `mapstructure:"APP_HOST"`
+	AppPort       string `mapstructure:"APP_PORT"`
+	AppPostgres   string `mapstructure:"APP_POSTGRES"`
+	AuthHost      string `mapstructure:"AUTH_HOST"`
+	AuthPort      string `mapstructure:"AUTH_PORT"`
+	AuthRedis     string `mapstructure:"AUTH_REDIS"`
+	AuthPostgres  string `mapstructure:"AUTH_POSTGRES"`
+	AuthSecretKey string `mapstructure:"AUTH_SECRET_KEY"`
 }
 
 func New() (*Config, error) {
-	viper.AddConfigPath("configs")
+	viper.AddConfigPath("configs/env")
 	viper.SetConfigName("config")
 	viper.SetConfigType("env")
 
