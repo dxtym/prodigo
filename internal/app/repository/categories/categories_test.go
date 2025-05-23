@@ -207,3 +207,36 @@ func Test_repository_DeleteCategory(t *testing.T) {
 		assert.Contains(t, err.Error(), "category not found or delete")
 	})
 }
+
+func Test_repository_CategoryStatistics(t *testing.T) {
+	t.Run("success on getting statistics", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		mockRows := new(postgres.MockRow)
+		defer mockPool.AssertExpectations(t)
+		defer mockRows.AssertExpectations(t)
+		repo := &repository{pool: mockPool}
+		ctx := context.Background()
+		mockPool.On("Query", ctx, mock.Anything, mock.Anything).Return(mockRows, nil)
+		mockRows.On("Next").Return(true).Once()
+		mockRows.On("Scan", mock.Anything, mock.Anything, mock.Anything,
+			mock.Anything, mock.Anything).Return(nil).Once()
+		mockRows.On("Next").Return(false).Once()
+		mockRows.On("Close").Return(nil).Once()
+
+		_, err := repo.CategoryStatistics(ctx)
+		assert.NoError(t, err)
+	})
+	t.Run("query error", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		mockRows := new(postgres.MockRow)
+		defer mockPool.AssertExpectations(t)
+		defer mockRows.AssertExpectations(t)
+		repo := &repository{pool: mockPool}
+		ctx := context.Background()
+		mockPool.On("Query", ctx, mock.Anything, mock.Anything).
+			Return(mockRows, errors.New("failed to get category statistics"))
+		_, err := repo.CategoryStatistics(ctx)
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to get category statistics")
+	})
+}

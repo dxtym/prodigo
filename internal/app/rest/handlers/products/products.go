@@ -227,3 +227,17 @@ func (h *Handler) GetProductImage(c *gin.Context) {
 
 	c.File(filePath)
 }
+
+func (h *Handler) RestoreProduct(c *gin.Context) {
+	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
+	}
+	if err := h.service.RestoreProduct(c.Request.Context(), id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.Status(http.StatusAccepted)
+	c.JSON(http.StatusOK, gin.H{"message": "product restored"})
+}

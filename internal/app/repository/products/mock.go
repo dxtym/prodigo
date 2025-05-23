@@ -41,4 +41,7 @@ func (m *MockRepo) UpdateProductStatus(ctx context.Context, id int64, status str
 	return args.Error(0)
 }
 
-var _ Repository = (*MockRepo)(nil)
+func (m *MockRepo) RestoreProduct(ctx context.Context, id int64) error {
+	args := m.Called(ctx, id)
+	return args.Error(0)
+}

@@ -247,3 +247,30 @@ func TestRepository_DeleteProduct(t *testing.T) {
 		assert.Error(t, err)
 	})
 }
+
+func Test_repository_RestoreProduct(t *testing.T) {
+	t.Run("success restore", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		repo := &repository{pool: mockPool}
+		ctx := context.Background()
+		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.NewCommandTag("UPDATE 1"), nil)
+		err := repo.RestoreProduct(ctx, 1)
+		assert.NoError(t, err)
+	})
+	t.Run("not found", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		repo := &repository{pool: mockPool}
+		ctx := context.Background()
+		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.NewCommandTag("UPDATE 0"), nil)
+		err := repo.RestoreProduct(ctx, 2)
+		assert.EqualError(t, err, "product not found")
+	})
+	t.Run("exec error", func(t *testing.T) {
+		mockPool := new(postgres.MockPool)
+		repo := &repository{pool: mockPool}
+		ctx := context.Background()
+		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.CommandTag{}, errors.New("some error"))
+		err := repo.RestoreProduct(ctx, 3)
+		assert.Error(t, err)
+	})
+}

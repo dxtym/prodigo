@@ -49,6 +49,7 @@ func (s *Server) SetupRoutes() {
 			prods.GET("/:id", s.productHandler.GetProductByID)
 			prods.PUT("/:id", s.productHandler.UpdateProduct)
 			prods.DELETE("/:id", s.productHandler.DeleteProduct)
+			prods.PUT("/:id/restore", s.productHandler.RestoreProduct)
 			prods.PUT("/:id/status", s.productHandler.UpdateProductStatus)
 			prods.POST("/:id/image", s.productHandler.UploadProductImage)
 			prods.GET("/:id/image", s.productHandler.GetProductImage)
@@ -60,6 +61,7 @@ func (s *Server) SetupRoutes() {
 			cats.GET("/", s.categoryHandler.GetAllCategories)
 			cats.PUT("/:id", s.categoryHandler.UpdateCategory)
 			cats.DELETE("/:id", s.categoryHandler.DeleteCategory)
+			cats.GET("/stats", s.categoryHandler.CategoryStatistics)
 		}
 	}
 }

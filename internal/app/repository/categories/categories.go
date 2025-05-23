@@ -12,6 +12,7 @@ type Repository interface {
 	UpdateCategory(ctx context.Context, c *models.Category) error
 	GetAllCategories(ctx context.Context) ([]*models.Category, error)
 	DeleteCategory(ctx context.Context, id int64) error
+	CategoryStatistics(ctx context.Context) ([]*models.CategoryStats, error)
 }
 
 type repository struct {
@@ -101,4 +102,32 @@ func (r *repository) DeleteCategory(ctx context.Context, id int64) error {
 		return errors.New("category not found or deleted")
 	}
 	return nil
+}
+
+func (r *repository) CategoryStatistics(ctx context.Context) ([]*models.CategoryStats, error) {
+	rows, err := r.pool.Query(ctx, `
+		SELECT 
+			c.id, c.name,
+			COUNT(p.id),
+			SUM(p.quantity),
+			SUM(p.price * p.quantity)
+		FROM categories AS c
+		LEFT JOIN products AS p ON p.category_id = c.id AND p.deleted_at IS NULL
+		WHERE c.deleted_at IS NULL
+		GROUP BY c.id, c.name
+		ORDER BY c.name`)
+	if err != nil {
+		return nil, errors.New("failed to get category statistics" + err.Error() + "")
+	}
+	defer rows.Close()
+
+	var stats []*models.CategoryStats
+	for rows.Next() {
+		var s models.CategoryStats
+		if err := rows.Scan(&s.CategoryID, &s.CategoryName, &s.ProductCount, &s.TotalQuantity, &s.TotalValue); err != nil {
+			return nil, errors.New("failed to scan category statistics")
+		}
+		stats = append(stats, &s)
+	}
+	return stats, nil
 }

@@ -43,3 +43,11 @@ func (s *Service) DeleteCategory(ctx context.Context, id int64) error {
 	}
 	return nil
 }
+
+func (s *Service) CategoryStatistics(ctx context.Context) ([]*models.CategoryStats, error) {
+	stats, err := s.repository.CategoryStatistics(ctx)
+	if err != nil {
+		return nil, errors.New("failed to get category statistics")
+	}
+	return stats, nil
+}
