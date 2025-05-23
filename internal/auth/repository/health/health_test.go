@@ -24,9 +24,9 @@ func TestRepository_Check(t *testing.T) {
 			name: "success",
 			build: func(pool *db.MockPool, client *rdb.MockClient) {
 				pool.On("Ping", mock.Anything).Return(nil).Once()
-				
+
 				cmd := redis.NewStatusCmd(context.Background())
-				
+
 				client.On("Ping", mock.Anything).Return(cmd).Once()
 			},
 			check: func(err error) {
@@ -46,10 +46,10 @@ func TestRepository_Check(t *testing.T) {
 			name: "invalid client",
 			build: func(pool *db.MockPool, client *rdb.MockClient) {
 				pool.On("Ping", mock.Anything).Return(nil).Once()
-				
+
 				cmd := redis.NewStatusCmd(context.Background())
 				cmd.SetErr(errors.New("client error"))
-				
+
 				client.On("Ping", mock.Anything).Return(cmd).Once()
 			},
 			check: func(err error) {

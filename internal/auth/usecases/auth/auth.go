@@ -66,13 +66,12 @@ func (s *service) Login(ctx context.Context, req dto.LoginRequest) (access, refr
 		return "", "", ErrInvalidCredentials
 	}
 
-	const userRole = "user"
-	accessToken, err := s.maker.CreateToken(user.ID, userRole, accessDuration)
+	accessToken, err := s.maker.CreateToken(user.ID, user.Role, accessDuration)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to create access token: %w", err)
 	}
 
-	refreshToken, err := s.maker.CreateToken(user.ID, userRole, refreshDuration)
+	refreshToken, err := s.maker.CreateToken(user.ID, user.Role, refreshDuration)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to create refresh token: %w", err)
 	}

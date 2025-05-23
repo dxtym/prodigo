@@ -15,7 +15,7 @@ import (
 func main() {
 	fx.New(
 		config.Module,
-		db.Module,
+		db.AuthModule,
 		repository.Module,
 		usecases.Module,
 		handlers.Module,

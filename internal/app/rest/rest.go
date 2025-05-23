@@ -3,23 +3,35 @@ package rest
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net"
 	"net/http"
 	"prodigo/internal/app/rest/handlers/categories"
 	"prodigo/internal/app/rest/handlers/products"
+	"prodigo/internal/app/rest/middleware"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Server struct {
 	mux             *gin.Engine
+	mw              *middleware.Middleware
 	srv             *http.Server
 	categoryHandler *categories.Handler
 	productHandler  *products.Handler
 }
 
-func New(mux *gin.Engine, productHandler *products.Handler, categoryHandler *categories.Handler) *Server {
-	return &Server{mux: mux, productHandler: productHandler, categoryHandler: categoryHandler}
+func New(
+	mw *middleware.Middleware,
+	productHandler *products.Handler,
+	categoryHandler *categories.Handler,
+) *Server {
+	return &Server{
+		mux:             gin.New(),
+		mw:              mw,
+		productHandler:  productHandler,
+		categoryHandler: categoryHandler,
+	}
 }
 
 func (s *Server) SetupRoutes() {
@@ -28,6 +40,8 @@ func (s *Server) SetupRoutes() {
 
 	v1 := s.mux.Group("/api/v1")
 	{
+		v1.Use(s.mw.Auth())
+
 		prods := v1.Group("/products")
 		{
 			prods.POST("/", s.productHandler.CreateProduct)
