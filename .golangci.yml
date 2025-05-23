@@ -53,9 +53,13 @@ linters:
         type: module
         settings:
           include-pkgs: ''
+    gosec:
+      excludes:
+        - G404
   exclusions:
     paths:
       - '^.*\/mock.go$'
+      - '^.*\/.*_test.go$'
       
 formatters:
   enable:

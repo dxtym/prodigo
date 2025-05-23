@@ -7,10 +7,8 @@ import (
 	"prodigo/internal/auth/usecases"
 	"prodigo/pkg/config"
 	"prodigo/pkg/db"
+	"prodigo/pkg/jwt"
 
-	"github.com/gin-gonic/gin"
-	_ "github.com/golang-migrate/migrate/v4/database/postgres"
-	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"go.uber.org/fx"
 )
 
@@ -22,6 +20,6 @@ func main() {
 		usecases.Module,
 		handlers.Module,
 		rest.Module,
-		fx.Provide(gin.New),
+		jwt.Module,
 	).Run()
 }

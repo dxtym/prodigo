@@ -2,7 +2,8 @@ package health_test
 
 import (
 	"context"
-	"prodigo/internal/auth/repository/health"
+	"errors"
+	healthRepository "prodigo/internal/auth/repository/health"
 	healthService "prodigo/internal/auth/usecases/health"
 	"testing"
 	"time"
@@ -11,23 +12,29 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestNew(t *testing.T) {
-	repository := new(health.MockRepository)
-
-	service := healthService.New(repository)
-
-	assert.NotNil(t, service)
-}
-
 func TestService_Check(t *testing.T) {
-	repository := new(health.MockRepository)
-	repository.On("Check", mock.Anything).Return(nil)
+	tests := []struct {
+		name    string
+		wantErr error
+	}{
+		{name: "success", wantErr: nil},
+		{name: "invalid check", wantErr: errors.New("some error")},
+	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			repository := new(healthRepository.MockRepository)
+			defer repository.AssertExpectations(t)
 
-	service := healthService.New(repository)
-	err := service.Check(ctx)
+			repository.On("Check", mock.Anything).Return(tt.wantErr).Once()
 
-	assert.NoError(t, err)
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+
+			service := healthService.New(repository)
+
+			err := service.Check(ctx)
+			assert.ErrorIs(t, err, tt.wantErr)
+		})
+	}
 }

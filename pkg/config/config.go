@@ -7,16 +7,14 @@ import (
 )
 
 type Config struct {
-	AuthHost    string `mapstructure:"AUTH_HOST"`
-	AuthPort    string `mapstructure:"AUTH_PORT"`
-	RedisAddr   string `mapstructure:"REDIS_ADDR"`
-	RedisPass   string `mapstructure:"REDIS_PASS"`
-	PostgresDSN string `mapstructure:"POSTGRES_DSN"`
-	MigrateURL  string `mapstructure:"MIGRATE_URL"`
-	Secret      string `mapstructure:"SECRET_KEY"`
+	AuthHost  string `mapstructure:"AUTH_HOST"`
+	AuthPort  string `mapstructure:"AUTH_PORT"`
+	Redis     string `mapstructure:"REDIS"`
+	Postgres  string `mapstructure:"POSTGRES"`
+	SecretKey string `mapstructure:"SECRET_KEY"`
 }
 
-func LoadConfig() (*Config, error) {
+func New() (*Config, error) {
 	viper.AddConfigPath("configs")
 	viper.SetConfigName("config")
 	viper.SetConfigType("env")

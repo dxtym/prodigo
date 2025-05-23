@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"prodigo/internal/auth/rest/handlers/auth"
 	"prodigo/internal/auth/rest/handlers/health"
 
 	"github.com/gin-gonic/gin"
@@ -16,10 +17,15 @@ type Server struct {
 	mux           *gin.Engine
 	srv           *http.Server
 	healthHandler *health.Handler
+	authHandler   *auth.Handler
 }
 
-func New(mux *gin.Engine, healthHandler *health.Handler) *Server {
-	return &Server{mux: mux, healthHandler: healthHandler}
+func New(healthHandler *health.Handler, authHandler *auth.Handler) *Server {
+	return &Server{
+		mux:           gin.New(),
+		healthHandler: healthHandler,
+		authHandler:   authHandler,
+	}
 }
 
 func (s *Server) setupRoutes() {
@@ -29,6 +35,13 @@ func (s *Server) setupRoutes() {
 	v1 := s.mux.Group("/api/v1")
 	{
 		v1.GET("/health", s.healthHandler.Check)
+
+		auths := v1.Group("/auth")
+		{
+			auths.POST("/register", s.authHandler.Register)
+			auths.POST("/login", s.authHandler.Login)
+			auths.POST("/refresh", s.authHandler.Refresh)
+		}
 	}
 }
 

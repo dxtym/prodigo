@@ -1,18 +1,32 @@
 version: '3.8'
-name: prodigo
+name: auth
 
 services:
   redis:
     image: 'redis:alpine'
     restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    environment:
+      - REDIS_PASSWORD=pass
     ports:
       - '6379:6379'
   postgres:
     image: 'postgres:alpine'
     restart: always
+    healthcheck:
+      test: ["CMD", "psql", "-U", "user", "-c", "SELECT 1"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=pass
-      - POSTGRESS_DB=prodigo
+      - POSTGRES_DB=prodigo
     ports:
       - '5432:5432'

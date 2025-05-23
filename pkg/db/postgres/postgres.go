@@ -21,8 +21,8 @@ type conn struct {
 	*pgxpool.Pool
 }
 
-func New(ctx context.Context, dsn string) (Pool, error) {
-	conf, err := pgxpool.ParseConfig(dsn)
+func New(ctx context.Context, url string) (Pool, error) {
+	conf, err := pgxpool.ParseConfig(url)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse config: %w", err)
 	}

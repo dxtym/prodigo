@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"prodigo/internal/auth/repository/auth"
 	"prodigo/internal/auth/repository/health"
 
 	"go.uber.org/fx"
@@ -9,5 +10,6 @@ import (
 var Module = fx.Module("repository",
 	fx.Provide(
 		health.New,
+		auth.New,
 	),
 )

@@ -26,3 +26,5 @@ func (m *MockClient) Ping(ctx context.Context) *redis.StatusCmd {
 	args := m.Called(ctx)
 	return args.Get(0).(*redis.StatusCmd)
 }
+
+var _ Client = (*MockClient)(nil)

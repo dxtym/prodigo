@@ -1,5 +1,5 @@
 version: '3.8'
-name: prodigo_app
+name: app
 
 services:
   postgres:

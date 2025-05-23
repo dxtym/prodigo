@@ -12,10 +12,10 @@ import (
 var Module = fx.Module("db",
 	fx.Provide(
 		func(conf *config.Config) (postgres.Pool, error) {
-			return postgres.New(context.Background(), conf.PostgresDSN)
+			return postgres.New(context.Background(), conf.Postgres)
 		},
 		func(conf *config.Config) (redis.Client, error) {
-			return redis.New(context.Background(), conf.RedisAddr, conf.RedisPass)
+			return redis.New(context.Background(), conf.Redis)
 		},
 	),
 )

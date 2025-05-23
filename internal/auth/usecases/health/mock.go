@@ -6,13 +6,13 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type MockRepository struct {
+type MockService struct {
 	mock.Mock
 }
 
-func (m *MockRepository) Check(ctx context.Context) error {
+func (m *MockService) Check(ctx context.Context) error {
 	args := m.Called(ctx)
 	return args.Error(0)
 }
 
-var _ Repository = (*MockRepository)(nil)
+var _ Service = (*MockService)(nil)
