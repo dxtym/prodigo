@@ -31,7 +31,7 @@ func New(pool db.Pool, client rdb.Client) (Repository, error) {
 		id BIGSERIAL PRIMARY KEY,
 		username VARCHAR(20) NOT NULL UNIQUE,
 		password VARCHAR(255) NOT NULL,
-		role VARCHAR(10) NOT NULL DEFAULT 'user',
+		role VARCHAR(50) NOT NULL DEFAULT 'user',
 		created_at TIMESTAMP NOT NULL DEFAULT NOW(),
 		updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
 		deleted_at TIMESTAMP
