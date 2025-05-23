@@ -117,15 +117,15 @@ func (r *repository) CategoryStatistics(ctx context.Context) ([]*models.Category
 		GROUP BY c.id, c.name
 		ORDER BY c.name`)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("failed to get category statistics" + err.Error() + "")
 	}
 	defer rows.Close()
 
 	var stats []*models.CategoryStats
 	for rows.Next() {
 		var s models.CategoryStats
-		if err = rows.Scan(&s.CategoryID, &s.CategoryName, &s.ProductCount, &s.TotalQuantity, &s.TotalValue); err != nil {
-			return nil, err
+		if err := rows.Scan(&s.CategoryID, &s.CategoryName, &s.ProductCount, &s.TotalQuantity, &s.TotalValue); err != nil {
+			return nil, errors.New("failed to scan category statistics")
 		}
 		stats = append(stats, &s)
 	}
