@@ -35,7 +35,27 @@ func (h *Handler) CreateProduct(c *gin.Context) {
 }
 
 func (h *Handler) GetAllProducts(c *gin.Context) {
-	prods, err := h.service.GetAllProducts(c.Request.Context())
+	var fs models.ProductFilterSearch
+	if v := c.Query("category"); v != "" {
+		fs.CategoryName = v
+	}
+	if v := c.Query("status"); v != "" {
+		fs.Status = v
+	}
+	if v := c.Query("price_min"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			fs.PriceMin = n
+		}
+	}
+	if v := c.Query("price_max"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			fs.PriceMax = n
+		}
+	}
+	if v := c.Query("search"); v != "" {
+		fs.Search = v
+	}
+	prods, err := h.service.GetAllProducts(c.Request.Context(), &fs)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

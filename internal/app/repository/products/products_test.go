@@ -139,7 +139,7 @@ func TestRepository_GetAllProducts(t *testing.T) {
 		mockRows.On("Next").Return(false).Once()
 		mockRows.On("Close").Return()
 
-		products, err := repo.GetAllProducts(context.Background())
+		products, err := repo.GetAllProducts(context.Background(), &models.ProductFilterSearch{})
 		assert.NoError(t, err)
 		assert.Len(t, products, 1)
 	})
@@ -153,7 +153,7 @@ func TestRepository_GetAllProducts(t *testing.T) {
 
 		mockPool.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, errors.New("query failed"))
 
-		products, err := repo.GetAllProducts(context.Background())
+		products, err := repo.GetAllProducts(context.Background(), &models.ProductFilterSearch{})
 		assert.Error(t, err)
 		assert.Nil(t, products)
 	})
@@ -172,7 +172,7 @@ func TestRepository_GetAllProducts(t *testing.T) {
 			mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(errors.New("scan failed")).Once()
 		mockRows.On("Close").Return()
 
-		products, err := repo.GetAllProducts(context.Background())
+		products, err := repo.GetAllProducts(context.Background(), &models.ProductFilterSearch{})
 		assert.Error(t, err)
 		assert.Nil(t, products)
 	})

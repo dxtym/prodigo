@@ -14,3 +14,11 @@ type Product struct {
 	Price      int       `json:"price"`
 	Quantity   int       `json:"quantity"`
 }
+
+type ProductFilterSearch struct {
+	Search       string
+	CategoryName string
+	Status       string
+	PriceMin     int
+	PriceMax     int
+}

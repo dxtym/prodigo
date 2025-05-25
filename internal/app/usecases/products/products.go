@@ -25,8 +25,8 @@ func (s *Service) CreateProduct(ctx context.Context, p *models.Product) error {
 	return nil
 }
 
-func (s *Service) GetAllProducts(ctx context.Context) ([]*models.Product, error) {
-	prods, err := s.repository.GetAllProducts(ctx)
+func (s *Service) GetAllProducts(ctx context.Context, fs *models.ProductFilterSearch) ([]*models.Product, error) {
+	prods, err := s.repository.GetAllProducts(ctx, fs)
 	if err != nil {
 		return nil, errors.New("failed to get all products")
 	}
