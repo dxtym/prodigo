@@ -71,7 +71,7 @@ func (h *Handler) DeleteCategory(c *gin.Context) {
 	c.JSON(http.StatusNoContent, gin.H{"message": "category deleted"})
 }
 
-func (h *Handler) CategoryStatistics(c *gin.Context) {
+func (h *Handler) GetCategoryStatistics(c *gin.Context) {
 	stats, err := h.service.CategoryStatistics(c.Request.Context())
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

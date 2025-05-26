@@ -61,7 +61,7 @@ func (s *Server) SetupRoutes() {
 			cats.GET("/", s.categoryHandler.GetAllCategories)
 			cats.PUT("/:id", s.categoryHandler.UpdateCategory)
 			cats.DELETE("/:id", s.categoryHandler.DeleteCategory)
-			cats.GET("/stats", s.categoryHandler.CategoryStatistics)
+			cats.GET("/stats", s.categoryHandler.GetCategoryStatistics)
 		}
 	}
 }
