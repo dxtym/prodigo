@@ -3,9 +3,11 @@ package products
 import (
 	"context"
 	"errors"
+	"fmt"
 	"prodigo/internal/app/models"
 	"prodigo/internal/app/repository/categories"
 	"prodigo/pkg/db/postgres"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -13,7 +15,7 @@ import (
 type Repository interface {
 	CreateProduct(ctx context.Context, p *models.Product) error
 	GetProductByID(ctx context.Context, id int64) (*models.Product, error)
-	GetAllProducts(ctx context.Context) ([]*models.Product, error)
+	GetAllProducts(ctx context.Context, fs *models.ProductFilterSearch) ([]*models.Product, error)
 	UpdateProduct(ctx context.Context, p *models.Product) error
 	DeleteProduct(ctx context.Context, id int64) error
 	RestoreProduct(ctx context.Context, id int64) error
@@ -59,12 +61,49 @@ func (r *repository) GetProductByID(ctx context.Context, id int64) (*models.Prod
 	return &p, nil
 }
 
-func (r *repository) GetAllProducts(ctx context.Context) ([]*models.Product, error) {
-	rows, err := r.pool.Query(ctx, `
-		SELECT id, title, category_id, price, quantity, image, status, created_at, updated_at
-		FROM products
-		WHERE deleted_at IS NULL
-	`)
+func (r *repository) GetAllProducts(ctx context.Context, fs *models.ProductFilterSearch) ([]*models.Product, error) {
+	var (
+		args  []interface{}
+		where []string
+		i     = 1
+	)
+
+	if fs.CategoryName != "" {
+		where = append(where, fmt.Sprintf("c.name ILIKE $%d", i))
+		args = append(args, "%"+fs.CategoryName+"%")
+		i++
+	}
+	if fs.Status != "" {
+		where = append(where, fmt.Sprintf("p.status = $%d", i))
+		args = append(args, fs.Status)
+		i++
+	}
+	if fs.PriceMin > 0 {
+		where = append(where, fmt.Sprintf("p.price >= $%d", i))
+		args = append(args, fs.PriceMin)
+		i++
+	}
+	if fs.PriceMax > 0 {
+		where = append(where, fmt.Sprintf("p.price <= $%d", i))
+		args = append(args, fs.PriceMax)
+		i++
+	}
+	if fs.Search != "" {
+		where = append(where, fmt.Sprintf("p.title ILIKE $%d", i))
+		args = append(args, "%"+fs.Search+"%")
+	}
+
+	fullQuery := ""
+	if len(where) > 0 {
+		fullQuery = " AND " + strings.Join(where, " AND ")
+	}
+
+	rows, err := r.pool.Query(ctx, fmt.Sprintf(`
+		SELECT p.id, p.title, p.category_id, p.price, p.quantity, p.image, p.status, p.created_at, p.updated_at
+		FROM products as p
+		LEFT JOIN categories c ON p.category_id = c.id
+		WHERE p.deleted_at IS NULL %s
+	`, fullQuery), args...)
 	if err != nil {
 		return nil, errors.New("failed to get all products: " + err.Error() + "")
 	}

@@ -16,8 +16,8 @@ func (m *MockRepo) CreateProduct(ctx context.Context, p *models.Product) error {
 	return args.Error(0)
 }
 
-func (m *MockRepo) GetAllProducts(ctx context.Context) ([]*models.Product, error) {
-	args := m.Called(ctx)
+func (m *MockRepo) GetAllProducts(ctx context.Context, fs *models.ProductFilterSearch) ([]*models.Product, error) {
+	args := m.Called(ctx, fs)
 	return args.Get(0).([]*models.Product), args.Error(1)
 }
 
