@@ -79,3 +79,12 @@ func (h *Handler) GetCategoryStatistics(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, stats)
 }
+
+func (h *Handler) CategoryStatistics(c *gin.Context) {
+	stats, err := h.service.CategoryStatistics(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, stats)
+}
