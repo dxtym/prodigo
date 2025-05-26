@@ -6,22 +6,28 @@ import (
 
 	"prodigo/pkg/db/postgres"
 	"prodigo/pkg/db/redis"
+
+	"go.uber.org/fx"
 )
 
 type Repository interface {
 	Check(context.Context) error
 }
 
-type repository struct {
-	pool   postgres.Pool
-	client redis.Client
+type RepositoryParams struct {
+	fx.In
+
+	Pool   postgres.Pool `name:"auth_postgres"`
+	Client redis.Client  `name:"auth_redis"`
 }
 
-func New(pool postgres.Pool, client redis.Client) Repository {
-	return &repository{
-		pool:   pool,
-		client: client,
-	}
+type repository struct {
+	pool   postgres.Pool `name:"auth_postgres"`
+	client redis.Client  `name:"auth_redis"`
+}
+
+func New(p RepositoryParams) Repository {
+	return &repository{pool: p.Pool, client: p.Client}
 }
 
 func (r *repository) Check(ctx context.Context) error {

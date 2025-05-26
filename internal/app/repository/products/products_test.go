@@ -20,8 +20,7 @@ func TestNew(t *testing.T) {
 
 		repo.On("Exec", mock.Anything, mock.Anything, mock.Anything).
 			Return(pgconn.CommandTag{}, errors.New("ddd"))
-		pool, err := New(repo, nil)
-		assert.NotNil(t, err)
+		pool := New(repo, nil)
 		assert.Nil(t, pool)
 	})
 	t.Run("can run ddl", func(t *testing.T) {
@@ -30,8 +29,7 @@ func TestNew(t *testing.T) {
 
 		repo.On("Exec", mock.Anything, mock.Anything, mock.Anything).
 			Return(pgconn.NewCommandTag("INSERT 1"), nil)
-		pool, err := New(repo, nil)
-		assert.Nil(t, err)
+		pool := New(repo, nil)
 		assert.NotNil(t, pool)
 	})
 }

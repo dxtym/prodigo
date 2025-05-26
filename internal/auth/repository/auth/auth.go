@@ -11,6 +11,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/fx"
 )
 
 type Repository interface {
@@ -20,29 +21,20 @@ type Repository interface {
 	GetToken(context.Context, int64) (string, error)
 }
 
+type RepositoryParams struct {
+	fx.In
+
+	Pool   db.Pool    `name:"auth_postgres"`
+	Client rdb.Client `name:"auth_redis"`
+}
+
 type repository struct {
 	pool   db.Pool
 	client rdb.Client
 }
 
-func New(pool db.Pool, client rdb.Client) (Repository, error) {
-	if _, err := pool.Exec(context.Background(), `
-	CREATE TABLE IF NOT EXISTS users (
-		id BIGSERIAL PRIMARY KEY,
-		username VARCHAR(20) NOT NULL UNIQUE,
-		password VARCHAR(255) NOT NULL,
-		role VARCHAR(50) NOT NULL DEFAULT 'user',
-		created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-		updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-		deleted_at TIMESTAMP
-	);`); err != nil {
-		return nil, fmt.Errorf("failed to create users table: %w", err)
-	}
-
-	return &repository{
-		pool:   pool,
-		client: client,
-	}, nil
+func New(p RepositoryParams) Repository {
+	return &repository{pool: p.Pool, client: p.Client}
 }
 
 func (r *repository) CreateUser(ctx context.Context, user *models.User) error {

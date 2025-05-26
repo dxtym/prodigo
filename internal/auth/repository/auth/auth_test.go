@@ -77,14 +77,16 @@ func TestRepository_CreateUser(t *testing.T) {
 				mock.Anything,
 			).Return(tt.want, tt.wantErr).Once()
 
-			repository, err := auth.New(pool, client)
+			repository := auth.New(auth.RepositoryParams{
+				Pool:   pool,
+				Client: client,
+			})
 			require.NotNil(t, repository)
-			require.NoError(t, err)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 
-			err = repository.CreateUser(ctx, tt.arg)
+			err := repository.CreateUser(ctx, tt.arg)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
@@ -143,9 +145,11 @@ func TestRepository_GetByUsername(t *testing.T) {
 				mock.Anything,
 			).Return(tt.wantErr).Once()
 
-			repository, err := auth.New(pool, client)
+			repository := auth.New(auth.RepositoryParams{
+				Pool:   pool,
+				Client: client,
+			})
 			require.NotNil(t, repository)
-			require.NoError(t, err)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
@@ -227,11 +231,13 @@ func TestRepository_SaveToken(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 
-			repository, err := auth.New(pool, client)
+			repository := auth.New(auth.RepositoryParams{
+				Pool:   pool,
+				Client: client,
+			})
 			require.NotNil(t, repository)
-			require.NoError(t, err)
 
-			err = repository.SaveToken(ctx, tt.arg.key, tt.arg.value, tt.arg.duration)
+			err := repository.SaveToken(ctx, tt.arg.key, tt.arg.value, tt.arg.duration)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
@@ -283,9 +289,11 @@ func TestRepository_GetToken(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 
-			repository, err := auth.New(pool, client)
+			repository := auth.New(auth.RepositoryParams{
+				Pool:   pool,
+				Client: client,
+			})
 			require.NotNil(t, repository)
-			require.NoError(t, err)
 
 			token, err := repository.GetToken(ctx, tt.arg)
 			assert.Equal(t, token, tt.want)

@@ -24,7 +24,7 @@ func TestHandler_Check(t *testing.T) {
 		{
 			name:     "success",
 			wantCode: http.StatusOK,
-			wantBody: `{"message":"ok"}`,
+			wantBody: `{"message":"OK"}`,
 			wantErr:  nil,
 		},
 		{
