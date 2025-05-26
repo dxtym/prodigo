@@ -108,7 +108,6 @@ func (r *repository) GetAllProducts(ctx context.Context, fs *models.ProductFilte
 	if fs.Search != "" {
 		where = append(where, fmt.Sprintf("p.title ILIKE $%d", i))
 		args = append(args, "%"+fs.Search+"%")
-		i++
 	}
 
 	fullQuery := ""
