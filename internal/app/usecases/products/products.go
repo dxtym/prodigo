@@ -8,6 +8,16 @@ import (
 	"prodigo/internal/app/repository/products"
 )
 
+type ServiceInterface interface {
+	CreateProduct(ctx context.Context, p *models.Product) error
+	GetProduct(ctx context.Context, id int64) (*models.Product, error)
+	GetAllProducts(ctx context.Context, fs *models.ProductFilterSearch) ([]*models.Product, error)
+	UpdateProduct(ctx context.Context, p *models.Product) error
+	DeleteProduct(ctx context.Context, id int64) error
+	RestoreProduct(ctx context.Context, id int64) error
+	UpdateProductStatus(ctx context.Context, id int64, status string) error
+}
+
 var ErrNotFound = errors.New("product not found")
 
 type Service struct {

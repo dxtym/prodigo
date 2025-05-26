@@ -11,6 +11,14 @@ type Service struct {
 	repository categories.Repository
 }
 
+type ServiceInterface interface {
+	CreateCategory(ctx context.Context, c *models.Category) error
+	UpdateCategory(ctx context.Context, c *models.Category) error
+	GetAllCategories(ctx context.Context) ([]*models.Category, error)
+	DeleteCategory(ctx context.Context, id int64) error
+	CategoryStatistics(ctx context.Context) ([]*models.CategoryStats, error)
+}
+
 func New(repository categories.Repository) *Service {
 	return &Service{repository: repository}
 }

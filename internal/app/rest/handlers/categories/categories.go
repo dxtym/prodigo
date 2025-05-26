@@ -9,10 +9,10 @@ import (
 )
 
 type Handler struct {
-	service *categories.Service
+	service categories.ServiceInterface
 }
 
-func New(service *categories.Service) *Handler {
+func New(service categories.ServiceInterface) *Handler {
 	return &Handler{service: service}
 }
 
@@ -62,12 +62,13 @@ func (h *Handler) DeleteCategory(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
 	}
 	if err := h.service.DeleteCategory(c.Request.Context(), id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusNoContent, gin.H{"message": "category deleted"})
 }
 
 func (h *Handler) CategoryStatistics(c *gin.Context) {

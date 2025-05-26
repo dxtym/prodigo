@@ -14,10 +14,10 @@ import (
 )
 
 type Handler struct {
-	service *products.Service
+	service products.ServiceInterface
 }
 
-func New(service *products.Service) *Handler {
+func New(service products.ServiceInterface) *Handler {
 	return &Handler{service: service}
 }
 
@@ -31,7 +31,14 @@ func (h *Handler) CreateProduct(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, p)
+	c.JSON(http.StatusCreated, gin.H{
+		"message":  "product created",
+		"id":       p.ID,
+		"title":    p.Title,
+		"price":    p.Price,
+		"quantity": p.Quantity,
+		"status":   p.Status,
+	})
 }
 
 func (h *Handler) GetAllProducts(c *gin.Context) {
@@ -118,7 +125,7 @@ func (h *Handler) DeleteProduct(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusNoContent, gin.H{"message": "product deleted"})
 }
 
 func (h *Handler) UpdateProductStatus(c *gin.Context) {
