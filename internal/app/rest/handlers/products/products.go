@@ -33,7 +33,6 @@ func (h *Handler) CreateProduct(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, gin.H{
 		"message":  "product created",
-		"id":       p.ID,
 		"title":    p.Title,
 		"price":    p.Price,
 		"quantity": p.Quantity,
