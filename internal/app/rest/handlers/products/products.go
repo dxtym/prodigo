@@ -14,10 +14,10 @@ import (
 )
 
 type Handler struct {
-	service *products.Service
+	service products.ServiceInterface
 }
 
-func New(service *products.Service) *Handler {
+func New(service products.ServiceInterface) *Handler {
 	return &Handler{service: service}
 }
 
@@ -31,11 +31,37 @@ func (h *Handler) CreateProduct(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, p)
+	c.JSON(http.StatusCreated, gin.H{
+		"message":  "product created",
+		"title":    p.Title,
+		"price":    p.Price,
+		"quantity": p.Quantity,
+		"status":   p.Status,
+	})
 }
 
 func (h *Handler) GetAllProducts(c *gin.Context) {
-	prods, err := h.service.GetAllProducts(c.Request.Context())
+	var fs models.ProductFilterSearch
+	if v := c.Query("category"); v != "" {
+		fs.CategoryName = v
+	}
+	if v := c.Query("status"); v != "" {
+		fs.Status = v
+	}
+	if v := c.Query("price_min"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			fs.PriceMin = n
+		}
+	}
+	if v := c.Query("price_max"); v != "" {
+		if n, err := strconv.Atoi(v); err == nil {
+			fs.PriceMax = n
+		}
+	}
+	if v := c.Query("search"); v != "" {
+		fs.Search = v
+	}
+	prods, err := h.service.GetAllProducts(c.Request.Context(), &fs)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -98,7 +124,7 @@ func (h *Handler) DeleteProduct(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Status(http.StatusNoContent)
+	c.JSON(http.StatusNoContent, gin.H{"message": "product deleted"})
 }
 
 func (h *Handler) UpdateProductStatus(c *gin.Context) {
