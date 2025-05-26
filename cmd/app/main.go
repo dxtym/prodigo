@@ -14,6 +14,8 @@ import (
 	"go.uber.org/fx"
 )
 
+// запуск
+
 func main() {
 	fx.New(
 		config.Module,
