@@ -69,11 +69,6 @@ func TestRepository_CreateUser(t *testing.T) {
 				mock.Anything,
 				mock.Anything,
 				mock.Anything,
-			).Return(pgconn.CommandTag{}, nil).Once()
-			pool.On("Exec",
-				mock.Anything,
-				mock.Anything,
-				mock.Anything,
 				mock.Anything,
 			).Return(tt.want, tt.wantErr).Once()
 
@@ -127,11 +122,6 @@ func TestRepository_GetByUsername(t *testing.T) {
 			require.NotNil(t, client)
 			defer client.AssertExpectations(t)
 
-			pool.On("Exec",
-				mock.Anything,
-				mock.Anything,
-				mock.Anything,
-			).Return(pgconn.CommandTag{}, nil).Once()
 			pool.On("QueryRow",
 				mock.Anything,
 				mock.Anything,
@@ -212,12 +202,6 @@ func TestRepository_SaveToken(t *testing.T) {
 			require.NotNil(t, client)
 			defer client.AssertExpectations(t)
 
-			pool.On("Exec",
-				mock.Anything,
-				mock.Anything,
-				mock.Anything,
-			).Return(pgconn.CommandTag{}, nil).Once()
-
 			cmd := redis.NewStatusCmd(context.Background())
 			cmd.SetErr(tt.wantErr)
 
@@ -273,12 +257,6 @@ func TestRepository_GetToken(t *testing.T) {
 			client := new(rdb.MockClient)
 			require.NotNil(t, client)
 			defer client.AssertExpectations(t)
-
-			pool.On("Exec",
-				mock.Anything,
-				mock.Anything,
-				mock.Anything,
-			).Return(pgconn.CommandTag{}, nil).Once()
 
 			cmd := redis.NewStringCmd(context.Background())
 			cmd.SetVal(tt.want)

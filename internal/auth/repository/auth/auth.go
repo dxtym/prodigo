@@ -38,17 +38,12 @@ func New(p Params) Repository {
 }
 
 func (r *repository) CreateUser(ctx context.Context, user *models.User) error {
-	cmd, err := r.pool.Exec(ctx, `	
+	if _, err := r.pool.Exec(ctx, `	
 	INSERT INTO users (
 		username, 
 		password
-	) VALUES ($1, $2);`, user.Username, user.Password)
-	if err != nil {
+	) VALUES ($1, $2);`, user.Username, user.Password); err != nil {
 		return fmt.Errorf("failed to create user: %w", err)
-	}
-
-	if cmd.RowsAffected() == 0 {
-		return ErrUserNotCreated
 	}
 
 	return nil
