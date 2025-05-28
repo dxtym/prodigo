@@ -3,7 +3,7 @@
 
 ## Запуск
 
-####Docker контейнеры
+#### Docker контейнеры
 ```
 make up service=auth
 
@@ -11,14 +11,14 @@ make up service=app
 
 ```
 
-####Запуск сервисов
+#### Запуск сервисов
 ```
 go run .\cmd\app\main.go
 
 go run .\cmd\auth\main.go
 ```
 
-####Запуск Swagger
+#### Запуск Swagger
 Через веб браузер
 В 
 ```http://localhost:8080/swagger/index.html```
@@ -29,9 +29,9 @@ go run .\cmd\auth\main.go
 проходим аутефикацию (Bearer <Token>)
 
 
-##API Эндпоинты
+## API Эндпоинты
 
-```http
+```http request
 GET    api/v1/health/            // проверка работоспособности сервиса
 POST   api/v1/auth/register      // регистрация
 POST   api/v1/auth/login         // логин
@@ -52,5 +52,4 @@ PUT     api/v1/products/:id/restore     // Восстановить товар
 PUT     api/v1/products/:id/status      // Изменить статус товара
 POST    api/v1/products/:id/image       // Загрузить изображение товара
 GET     api/v1/products/:id/image       // Получить изображение товара
-
 ```
