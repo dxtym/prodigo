@@ -9,21 +9,25 @@ import (
 	"go.uber.org/fx"
 )
 
-var AuthModule = fx.Module("db",
+var Module = fx.Module("db",
 	fx.Provide(
-		func(conf *config.Config) (postgres.Pool, error) {
-			return postgres.New(context.Background(), conf.AuthPostgres)
-		},
-		func(conf *config.Config) (redis.Client, error) {
-			return redis.New(context.Background(), conf.AuthRedis)
-		},
-	),
-)
-
-var AppModule = fx.Module("db",
-	fx.Provide(
-		func(conf *config.Config) (postgres.Pool, error) {
-			return postgres.New(context.Background(), conf.AppPostgres)
-		},
+		fx.Annotate(
+			func(conf *config.Config) (postgres.Pool, error) {
+				return postgres.New(context.Background(), conf.AuthPostgres)
+			},
+			fx.ResultTags(`name:"auth_postgres"`),
+		),
+		fx.Annotate(
+			func(conf *config.Config) (redis.Client, error) {
+				return redis.New(context.Background(), conf.AuthRedis)
+			},
+			fx.ResultTags(`name:"auth_redis"`),
+		),
+		fx.Annotate(
+			func(conf *config.Config) (postgres.Pool, error) {
+				return postgres.New(context.Background(), conf.AppPostgres)
+			},
+			fx.ResultTags(`name:"app_postgres"`),
+		),
 	),
 )

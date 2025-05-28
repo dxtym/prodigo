@@ -24,7 +24,7 @@ type Service struct {
 	repository products.Repository
 }
 
-func New(repository products.Repository) *Service {
+func New(repository products.Repository) ServiceInterface {
 	return &Service{repository: repository}
 }
 

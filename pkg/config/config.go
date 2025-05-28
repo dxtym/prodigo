@@ -7,11 +7,13 @@ import (
 )
 
 type Config struct {
+	AppMigrate    string `mapstructure:"APP_MIGRATE"`
 	AppCasbin     string `mapstructure:"APP_CASBIN"`
 	AppPolicy     string `mapstructure:"APP_POLICY"`
 	AppHost       string `mapstructure:"APP_HOST"`
 	AppPort       string `mapstructure:"APP_PORT"`
 	AppPostgres   string `mapstructure:"APP_POSTGRES"`
+	AuthMigrate   string `mapstructure:"AUTH_MIGRATE"`
 	AuthHost      string `mapstructure:"AUTH_HOST"`
 	AuthPort      string `mapstructure:"AUTH_PORT"`
 	AuthRedis     string `mapstructure:"AUTH_REDIS"`

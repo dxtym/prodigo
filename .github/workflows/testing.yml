@@ -35,7 +35,7 @@ jobs:
       - name: Run tests with coverage
         run: |
           go test ./... -coverprofile=coverage.out.mocks -covermode=atomic
-          grep -v 'mock' coverage.out.mocks > coverage.out
+          grep -vE 'mock|api|cmd|db|casbin|migration' coverage.out.mocks > coverage.out
 
       - name: Convert coverage to Cobertura format
         run: $(which gocover-cobertura) < coverage.out > coverage.xml

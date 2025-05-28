@@ -16,7 +16,7 @@
 # Go workspace file
 go.work
 
-.vscode/*
+.vscode/
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json

@@ -19,7 +19,7 @@ type ServiceInterface interface {
 	CategoryStatistics(ctx context.Context) ([]*models.CategoryStats, error)
 }
 
-func New(repository categories.Repository) *Service {
+func New(repository categories.Repository) ServiceInterface {
 	return &Service{repository: repository}
 }
 

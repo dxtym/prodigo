@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5"
 	"prodigo/internal/app/models"
-	"prodigo/internal/app/repository/categories"
 	"prodigo/pkg/db/postgres"
 	"strings"
+
+	"github.com/jackc/pgx/v5"
+	"go.uber.org/fx"
 )
 
 type Repository interface {
@@ -22,30 +23,18 @@ type Repository interface {
 
 var ErrNotFound = errors.New("product not found")
 
-type repository struct {
-	pool postgres.Pool
+type Params struct {
+	fx.In
+
+	Pool postgres.Pool `name:"app_postgres"`
 }
 
-func New(pool postgres.Pool, categoriesRepo categories.Repository) (Repository, error) {
-	_, err := pool.Exec(context.Background(), `
-CREATE TABLE IF NOT EXISTS products (
-    id SERIAL PRIMARY KEY,
-    title TEXT NOT NULL,
-    category_id INTEGER references categories(id),
-    price INTEGER NOT NULL check (price > 0),
-    quantity INTEGER NOT NULL check ( quantity > 0 ),
-    image TEXT,
-    status TEXT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    deleted_at TIMESTAMP
-)`)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create table products: %w", err)
-	}
-	return &repository{
-		pool: pool,
-	}, nil
+type repository struct {
+	pool postgres.Pool `name:"app_postgres"`
+}
+
+func New(p Params) Repository {
+	return &repository{pool: p.Pool}
 }
 
 func (r *repository) CreateProduct(ctx context.Context, p *models.Product) error {

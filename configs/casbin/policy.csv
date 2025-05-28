@@ -1,11 +1,11 @@
-p,user,/api/v1/products/,GET
-p,user,/api/v1/products/:id/,GET
-p,user,/api/v1/products/:id/photo/,GET
+p,(user)|(admin),/api/v1/products/,GET
+p,(user)|(admin),/api/v1/products/:id/,GET
+p,(user)|(admin),/api/v1/products/:id/photo/,GET
 p,admin,/api/v1/products/,POST
 p,admin,/api/v1/products/:id/,(PUT)|(DELETE)
 p,admin,/api/v1/products/:id/status/,PUT
 p,admin,/api/v1/products/:id/restore/,PUT
 p,admin,/api/v1/products/:id/photo/,POST
-p,admin,/api/v1/categories/,POST
-p,admin,/api/v1/categories/:id/,PUT
+p,admin,/api/v1/categories/,(POST)|(GET)
+p,admin,/api/v1/categories/:id/,(PUT)|(DELETE)
 p,admin,/api/v1/categories/stats,GET

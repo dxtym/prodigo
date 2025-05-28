@@ -1,19 +1,27 @@
+@host = localhost
+@port = 8000
+@version = api/v1
+@baseUrl = {{host}}:{{port}}/{{version}}
+@accessToken = ACCESS_TOKEN_HERE
+
 ###
-POST http://localhost:8000/api/v1/categories/
-Authorization: Bearer {access_token}
+
+POST http://{{baseUrl}}/categories/ HTTP/1.1
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "name": "Электроника"
+  "name": "electronics"
 }
 
 ###
-POST http://localhost:8000/api/v1/products/
-Authorization: Bearer {access_token}
+
+POST http://{{baseUrl}}/products/ HTTP/1.1
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "title": "Phone",
+  "title": "phone",
   "price": 40000,
   "quantity": 6,
   "category_id": 1,
@@ -21,48 +29,49 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:8000/api/v1/products/
-Authorization: Bearer {access_token}
+
+GET http://{{baseUrl}}/products/ HTTP/1.1
+Authorization: Bearer {{accessToken}}
 
 ###
 
-GET http://localhost:8000/api/v1/products/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiYXVkIjpbInVzZXIiXSwiZXhwIjoxNzQ4MDEwNDMwLCJpYXQiOjE3NDgwMDk1MzAsImp0aSI6IjM2OWZiYjI2LWU0NmItNDZlOC1hZjUyLWY1NjlhMDA0Yjg3NCJ9.PhY3XEsrsry3EajfSZTNi1ZoLCU_40L1UxTj9v1nmUg
+GET http://{{baseUrl}}/products/1 HTTP/1.1
+Authorization: Bearer {{accessToken}}
 
 ###
 
-PUT http://localhost:8000/api/v1/products/1
-Authorization: Bearer {access_token}
+PUT http://{{baseUrl}}/products/1 HTTP/1.1
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "title": "Новый заголовок 2"
+  "title": "watch"
 }
 
 ###
 
-PUT http://localhost:8000/api/v1/products/1/status
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiYXVkIjpbInVzZXIiXSwiZXhwIjoxNzQ4MDEwNDMwLCJpYXQiOjE3NDgwMDk1MzAsImp0aSI6IjM2OWZiYjI2LWU0NmItNDZlOC1hZjUyLWY1NjlhMDA0Yjg3NCJ9.PhY3XEsrsry3EajfSZTNi1ZoLCU_40L1UxTj9v1nmUg
+PUT http://{{baseUrl}}/products/1/status HTTP/1.1
+Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "status": "снова в продаже"
+  "status": "available"
 }
 
 ###
 
-POST http://localhost:8000/api/v1/products/1/image
-Authorization: Bearer {access_token}
+POST http://{{baseUrl}}/products/1/image HTTP/1.1
+Authorization: Bearer {{accessToken}}
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
 --WebAppBoundary
-Content-Disposition: form-data; name="image"; filename="test.jpg"
 Content-Type: image/jpeg
+Content-Disposition: form-data; name="image"; filename="test.jpg"
 
 < test.jpg
 --WebAppBoundary--
 
 ###
 
-GET http://localhost:8000/api/v1/products/1/image
-Authorization: Bearer {access_token}
+GET http://{{baseUrl}}/products/1/image HTTP/1.1
+Authorization: Bearer {{accessToken}}

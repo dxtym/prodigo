@@ -11,36 +11,13 @@ import (
 	"testing"
 )
 
-func TestNew(t *testing.T) {
-	t.Run("can't run ddl", func(t *testing.T) {
-		repo := new(postgres.MockPool)
-		defer repo.AssertExpectations(t)
-
-		repo.On("Exec", mock.Anything, mock.Anything, mock.Anything).
-			Return(pgconn.CommandTag{}, errors.New("cannot create table categories"))
-		pool, err := New(repo)
-		assert.NotNil(t, err)
-		assert.Nil(t, pool)
-	})
-	t.Run("can run ddl", func(t *testing.T) {
-		repo := new(postgres.MockPool)
-		defer repo.AssertExpectations(t)
-
-		repo.On("Exec", mock.Anything, mock.Anything, mock.Anything).
-			Return(pgconn.NewCommandTag("INSERT 1"), nil)
-		pool, err := New(repo)
-		assert.Nil(t, err)
-		assert.NotNil(t, pool)
-	})
-}
-
 func Test_repository_CreateCategory(t *testing.T) {
 	t.Run("error on insert", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
 
 		defer mockPool.AssertExpectations(t)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		category := &models.Category{}
 
 		mockPool.On("Exec", mock.Anything, mock.Anything, mock.Anything).
@@ -60,7 +37,7 @@ func Test_repository_CreateCategory(t *testing.T) {
 		mockPool.On("Exec", mock.Anything, mock.Anything, mock.Anything).
 			Return(pgconn.NewCommandTag("INSERT 1"), nil)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		err := repo.CreateCategory(context.Background(), &models.Category{})
 
 		assert.NoError(t, err)
@@ -75,7 +52,7 @@ func TestRepository_GetAllCategories(t *testing.T) {
 		defer mockPool.AssertExpectations(t)
 		defer mockRows.AssertExpectations(t)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 
 		mockPool.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
 
@@ -93,7 +70,7 @@ func TestRepository_GetAllCategories(t *testing.T) {
 		mockRows := new(postgres.MockRow)
 		defer mockPool.AssertExpectations(t)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 
 		mockPool.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, errors.New("query failed"))
 
@@ -108,7 +85,7 @@ func TestRepository_GetAllCategories(t *testing.T) {
 		defer mockPool.AssertExpectations(t)
 		defer mockRows.AssertExpectations(t)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 
 		mockPool.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
 
@@ -126,7 +103,7 @@ func Test_repository_UpdateCategory(t *testing.T) {
 	t.Run("not found cat", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		defer mockPool.AssertExpectations(t)
 
 		ctx := context.Background()
@@ -139,7 +116,7 @@ func Test_repository_UpdateCategory(t *testing.T) {
 	t.Run("success update of cat", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 
 		defer mockPool.AssertExpectations(t)
 
@@ -155,7 +132,7 @@ func Test_repository_UpdateCategory(t *testing.T) {
 		mockRow := new(postgres.MockRow)
 		defer mockPool.AssertExpectations(t)
 		defer mockRow.AssertExpectations(t)
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		ctx := context.Background()
 		tag := pgconn.NewCommandTag("UPDATE 0")
 		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(tag, errors.New("exec error"))
@@ -171,7 +148,7 @@ func Test_repository_DeleteCategory(t *testing.T) {
 
 		defer mockPool.AssertExpectations(t)
 
-		pool := &repository{pool: mockPool}
+		pool := New(Params{Pool: mockPool})
 
 		ctx := context.Background()
 		tag := pgconn.NewCommandTag("DELETE 1")
@@ -184,7 +161,7 @@ func Test_repository_DeleteCategory(t *testing.T) {
 		mockRow := new(postgres.MockRow)
 		defer mockPool.AssertExpectations(t)
 		defer mockRow.AssertExpectations(t)
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		ctx := context.Background()
 		tag := pgconn.NewCommandTag("DELETE 0")
 		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(tag, errors.New("exec error"))
@@ -198,7 +175,7 @@ func Test_repository_DeleteCategory(t *testing.T) {
 		mockRow := new(postgres.MockRow)
 		defer mockPool.AssertExpectations(t)
 		defer mockRow.AssertExpectations(t)
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		ctx := context.Background()
 		tag := pgconn.NewCommandTag("DELETE 0")
 		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(tag, nil)
@@ -214,7 +191,7 @@ func Test_repository_CategoryStatistics(t *testing.T) {
 		mockRows := new(postgres.MockRow)
 		defer mockPool.AssertExpectations(t)
 		defer mockRows.AssertExpectations(t)
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		ctx := context.Background()
 		mockPool.On("Query", ctx, mock.Anything, mock.Anything).Return(mockRows, nil)
 		mockRows.On("Next").Return(true).Once()
@@ -231,7 +208,7 @@ func Test_repository_CategoryStatistics(t *testing.T) {
 		mockRows := new(postgres.MockRow)
 		defer mockPool.AssertExpectations(t)
 		defer mockRows.AssertExpectations(t)
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		ctx := context.Background()
 		mockPool.On("Query", ctx, mock.Anything, mock.Anything).
 			Return(mockRows, errors.New("failed to get category statistics"))

@@ -69,22 +69,19 @@ func TestRepository_CreateUser(t *testing.T) {
 				mock.Anything,
 				mock.Anything,
 				mock.Anything,
-			).Return(pgconn.CommandTag{}, nil).Once()
-			pool.On("Exec",
-				mock.Anything,
-				mock.Anything,
-				mock.Anything,
 				mock.Anything,
 			).Return(tt.want, tt.wantErr).Once()
 
-			repository, err := auth.New(pool, client)
+			repository := auth.New(auth.Params{
+				Pool:   pool,
+				Client: client,
+			})
 			require.NotNil(t, repository)
-			require.NoError(t, err)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 
-			err = repository.CreateUser(ctx, tt.arg)
+			err := repository.CreateUser(ctx, tt.arg)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
@@ -125,11 +122,6 @@ func TestRepository_GetByUsername(t *testing.T) {
 			require.NotNil(t, client)
 			defer client.AssertExpectations(t)
 
-			pool.On("Exec",
-				mock.Anything,
-				mock.Anything,
-				mock.Anything,
-			).Return(pgconn.CommandTag{}, nil).Once()
 			pool.On("QueryRow",
 				mock.Anything,
 				mock.Anything,
@@ -143,9 +135,11 @@ func TestRepository_GetByUsername(t *testing.T) {
 				mock.Anything,
 			).Return(tt.wantErr).Once()
 
-			repository, err := auth.New(pool, client)
+			repository := auth.New(auth.Params{
+				Pool:   pool,
+				Client: client,
+			})
 			require.NotNil(t, repository)
-			require.NoError(t, err)
 
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
@@ -208,12 +202,6 @@ func TestRepository_SaveToken(t *testing.T) {
 			require.NotNil(t, client)
 			defer client.AssertExpectations(t)
 
-			pool.On("Exec",
-				mock.Anything,
-				mock.Anything,
-				mock.Anything,
-			).Return(pgconn.CommandTag{}, nil).Once()
-
 			cmd := redis.NewStatusCmd(context.Background())
 			cmd.SetErr(tt.wantErr)
 
@@ -227,11 +215,13 @@ func TestRepository_SaveToken(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 
-			repository, err := auth.New(pool, client)
+			repository := auth.New(auth.Params{
+				Pool:   pool,
+				Client: client,
+			})
 			require.NotNil(t, repository)
-			require.NoError(t, err)
 
-			err = repository.SaveToken(ctx, tt.arg.key, tt.arg.value, tt.arg.duration)
+			err := repository.SaveToken(ctx, tt.arg.key, tt.arg.value, tt.arg.duration)
 			assert.ErrorIs(t, err, tt.wantErr)
 		})
 	}
@@ -268,12 +258,6 @@ func TestRepository_GetToken(t *testing.T) {
 			require.NotNil(t, client)
 			defer client.AssertExpectations(t)
 
-			pool.On("Exec",
-				mock.Anything,
-				mock.Anything,
-				mock.Anything,
-			).Return(pgconn.CommandTag{}, nil).Once()
-
 			cmd := redis.NewStringCmd(context.Background())
 			cmd.SetVal(tt.want)
 			cmd.SetErr(tt.wantErr)
@@ -283,9 +267,11 @@ func TestRepository_GetToken(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 
-			repository, err := auth.New(pool, client)
+			repository := auth.New(auth.Params{
+				Pool:   pool,
+				Client: client,
+			})
 			require.NotNil(t, repository)
-			require.NoError(t, err)
 
 			token, err := repository.GetToken(ctx, tt.arg)
 			assert.Equal(t, token, tt.want)

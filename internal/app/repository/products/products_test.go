@@ -13,33 +13,10 @@ import (
 	"testing"
 )
 
-func TestNew(t *testing.T) {
-	t.Run("can't run ddl", func(t *testing.T) {
-		repo := new(postgres.MockPool)
-		defer repo.AssertExpectations(t)
-
-		repo.On("Exec", mock.Anything, mock.Anything, mock.Anything).
-			Return(pgconn.CommandTag{}, errors.New("ddd"))
-		pool, err := New(repo, nil)
-		assert.NotNil(t, err)
-		assert.Nil(t, pool)
-	})
-	t.Run("can run ddl", func(t *testing.T) {
-		repo := new(postgres.MockPool)
-		defer repo.AssertExpectations(t)
-
-		repo.On("Exec", mock.Anything, mock.Anything, mock.Anything).
-			Return(pgconn.NewCommandTag("INSERT 1"), nil)
-		pool, err := New(repo, nil)
-		assert.Nil(t, err)
-		assert.NotNil(t, pool)
-	})
-}
-
 func Test_repository_CreateProduct(t *testing.T) {
 	t.Run("error on insert", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 
 		mockPool.On("Exec", mock.Anything, mock.Anything, mock.Anything).
 			Return(pgconn.CommandTag{}, errors.New("cannot create product"))
@@ -55,7 +32,7 @@ func Test_repository_CreateProduct(t *testing.T) {
 		mockPool := new(postgres.MockPool)
 		defer mockPool.AssertExpectations(t)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 
 		mockPool.On("Exec", mock.Anything, mock.Anything, mock.Anything).
 			Return(pgconn.NewCommandTag("INSERT 1"), nil)
@@ -73,7 +50,7 @@ func TestRepository_GetProductByID(t *testing.T) {
 		defer mockPool.AssertExpectations(t)
 		defer mockRow.AssertExpectations(t)
 
-		pool := &repository{pool: mockPool}
+		pool := New(Params{Pool: mockPool})
 
 		mockPool.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).
 			Return(mockRow)
@@ -90,7 +67,7 @@ func TestRepository_GetProductByID(t *testing.T) {
 		defer mockPool.AssertExpectations(t)
 		defer mockRow.AssertExpectations(t)
 
-		pool := &repository{pool: mockPool}
+		pool := New(Params{Pool: mockPool})
 
 		mockPool.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).
 			Return(mockRow)
@@ -107,7 +84,7 @@ func TestRepository_GetProductByID(t *testing.T) {
 		defer mockPool.AssertExpectations(t)
 		defer mockRow.AssertExpectations(t)
 
-		pool := &repository{pool: mockPool}
+		pool := New(Params{Pool: mockPool})
 
 		mockPool.On("QueryRow", mock.Anything, mock.Anything, mock.Anything).
 			Return(mockRow)
@@ -128,7 +105,7 @@ func TestRepository_GetAllProducts(t *testing.T) {
 		defer mockPool.AssertExpectations(t)
 		defer mockRows.AssertExpectations(t)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 
 		mockPool.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
 
@@ -149,7 +126,7 @@ func TestRepository_GetAllProducts(t *testing.T) {
 
 		defer mockPool.AssertExpectations(t)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 
 		mockPool.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, errors.New("query failed"))
 
@@ -164,7 +141,7 @@ func TestRepository_GetAllProducts(t *testing.T) {
 		defer mockPool.AssertExpectations(t)
 		defer mockRows.AssertExpectations(t)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 
 		mockPool.On("Query", mock.Anything, mock.Anything, mock.Anything).Return(mockRows, nil)
 		mockRows.On("Next").Return(true).Once()
@@ -183,7 +160,7 @@ func TestRepository_UpdateProduct(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 
 		ctx := context.Background()
 		tag := pgconn.NewCommandTag("UPDATE 1")
@@ -196,7 +173,7 @@ func TestRepository_UpdateProduct(t *testing.T) {
 	t.Run("not found", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 
 		ctx := context.Background()
 		tag := pgconn.NewCommandTag("UPDATE 0")
@@ -209,7 +186,7 @@ func TestRepository_UpdateProduct(t *testing.T) {
 	t.Run("exec error", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 
 		ctx := context.Background()
 		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.CommandTag{}, errors.New("some error"))
@@ -223,7 +200,7 @@ func TestRepository_DeleteProduct(t *testing.T) {
 	t.Run("success delete", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
 
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		ctx := context.Background()
 		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.NewCommandTag("DELETE 1"), nil)
 
@@ -232,7 +209,7 @@ func TestRepository_DeleteProduct(t *testing.T) {
 	})
 	t.Run("not found", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		ctx := context.Background()
 		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.NewCommandTag("DELETE 0"), nil)
 		err := repo.DeleteProduct(ctx, 2)
@@ -240,7 +217,7 @@ func TestRepository_DeleteProduct(t *testing.T) {
 	})
 	t.Run("exec error", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		ctx := context.Background()
 		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.CommandTag{}, errors.New("some error"))
 		err := repo.DeleteProduct(ctx, 3)
@@ -251,7 +228,7 @@ func TestRepository_DeleteProduct(t *testing.T) {
 func Test_repository_RestoreProduct(t *testing.T) {
 	t.Run("success restore", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		ctx := context.Background()
 		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.NewCommandTag("UPDATE 1"), nil)
 		err := repo.RestoreProduct(ctx, 1)
@@ -259,7 +236,7 @@ func Test_repository_RestoreProduct(t *testing.T) {
 	})
 	t.Run("not found", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		ctx := context.Background()
 		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.NewCommandTag("UPDATE 0"), nil)
 		err := repo.RestoreProduct(ctx, 2)
@@ -267,7 +244,7 @@ func Test_repository_RestoreProduct(t *testing.T) {
 	})
 	t.Run("exec error", func(t *testing.T) {
 		mockPool := new(postgres.MockPool)
-		repo := &repository{pool: mockPool}
+		repo := New(Params{Pool: mockPool})
 		ctx := context.Background()
 		mockPool.On("Exec", ctx, mock.Anything, mock.Anything).Return(pgconn.CommandTag{}, errors.New("some error"))
 		err := repo.RestoreProduct(ctx, 3)

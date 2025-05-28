@@ -1,33 +1,27 @@
 gcl:
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	@/snap/bin/go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	$$(which golangci-lint) custom
 
 lint:
 	bin/custom-gcl run ./...
 
-auth:
-	go run cmd/auth/main.go
-
-app:
-	go run cmd/app/main.go
+server:
+	@/snap/bin/go run cmd/$(service)/main.go
 
 test:
 	mkdir -p data
-	go test -v -covermode=atomic -coverprofile=data/coverage.out ./...
+	@/snap/bin/go test -v -covermode=atomic -coverprofile=data/coverage.out ./...
 	grep -v "mock" data/coverage.out > data/coverage.out.tmp
-	go tool cover -html data/coverage.out.tmp -o data/coverage.html
+	@/snap/bin/go tool cover -html data/coverage.out.tmp -o data/coverage.html
 	open data/coverage.html
 
-app-up:
-	cd deployments/app && docker-compose up -d
+up:
+	cd deployments/$(service) && docker-compose up -d
 
-app-down:
-	cd deployments/app && docker-compose down
+down:
+	cd deployments/$(service) && docker-compose down
 
-auth-up:
-	cd deployments/auth && docker-compose up -d
+migrate:
+	migrate create -ext sql -dir migrations/$(service) -seq -digits 2 $(name)
 
-auth-down:
-	cd deployments/auth && docker-compose down
-
-.PHONY: gcl lint auth app test auth-up auth-down app-up app-down
+.PHONY: gcl lint server test up down migrate

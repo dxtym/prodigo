@@ -5,6 +5,8 @@ import (
 	"errors"
 	"prodigo/internal/app/models"
 	"prodigo/pkg/db/postgres"
+
+	"go.uber.org/fx"
 )
 
 type Repository interface {
@@ -15,26 +17,18 @@ type Repository interface {
 	CategoryStatistics(ctx context.Context) ([]*models.CategoryStats, error)
 }
 
-type repository struct {
-	pool postgres.Pool
+type Params struct {
+	fx.In
+
+	Pool postgres.Pool `name:"app_postgres"`
 }
 
-func New(pool postgres.Pool) (Repository, error) {
-	_, err := pool.Exec(context.Background(), `
-CREATE TABLE IF NOT EXISTS categories (
-	id SERIAL PRIMARY KEY,
-	name TEXT NOT NULL UNIQUE,
-	created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-	updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-	deleted_at TIMESTAMP
-)`)
-	if err != nil {
-		return nil, errors.New("failed to create categories table")
-	}
+type repository struct {
+	pool postgres.Pool `name:"app_postgres"`
+}
 
-	return &repository{
-		pool: pool,
-	}, nil
+func New(p Params) Repository {
+	return &repository{pool: p.Pool}
 }
 
 func (r *repository) CreateCategory(ctx context.Context, c *models.Category) error {

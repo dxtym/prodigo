@@ -5,10 +5,14 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	_ "prodigo/api/app"
 	"prodigo/internal/app/rest/handlers/categories"
 	"prodigo/internal/app/rest/handlers/products"
 	"prodigo/internal/app/rest/middleware"
 	"time"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -34,7 +38,17 @@ func New(
 	}
 }
 
-func (s *Server) SetupRoutes() {
+//	@title			Prodigo App Service
+//	@version		1.0
+//	@description	This is the app service for Prodigo.
+
+//	@host		localhost:8000
+//	@BasePath	/api/v1
+
+// @securityDefinitions.apiKey ApiKeyAuth
+// @in							header
+// @name						Authorization
+func (s *Server) Start(host, port string) error {
 	s.mux.Use(gin.Logger())
 	s.mux.Use(gin.Recovery())
 
@@ -61,13 +75,11 @@ func (s *Server) SetupRoutes() {
 			cats.GET("/", s.categoryHandler.GetAllCategories)
 			cats.PUT("/:id", s.categoryHandler.UpdateCategory)
 			cats.DELETE("/:id", s.categoryHandler.DeleteCategory)
-			cats.GET("/stats", s.categoryHandler.GetCategoryStatistics)
+			cats.GET("/stats", s.categoryHandler.CategoryStatistics)
 		}
 	}
-}
 
-func (s *Server) Start(host, port string) error {
-	s.SetupRoutes()
+	s.mux.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	s.srv = &http.Server{
 		Addr:              net.JoinHostPort(host, port),

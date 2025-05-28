@@ -7,8 +7,12 @@ import (
 	"net/http"
 	"time"
 
+	_ "prodigo/api/auth"
 	"prodigo/internal/auth/rest/handlers/auth"
 	"prodigo/internal/auth/rest/handlers/health"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,7 +32,13 @@ func New(healthHandler *health.Handler, authHandler *auth.Handler) *Server {
 	}
 }
 
-func (s *Server) setupRoutes() {
+// @title			Prodigo Auth Service
+// @version			1.0
+// @description		This is the auth service for Prodigo.
+
+// @host			localhost:8080
+// @BasePath		/api/v1
+func (s *Server) Start(host, port string) error {
 	s.mux.Use(gin.Logger())
 	s.mux.Use(gin.Recovery())
 
@@ -43,10 +53,8 @@ func (s *Server) setupRoutes() {
 			auths.POST("/refresh", s.authHandler.Refresh)
 		}
 	}
-}
 
-func (s *Server) Start(host, port string) error {
-	s.setupRoutes()
+	s.mux.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	s.srv = &http.Server{
 		Addr:              net.JoinHostPort(host, port),
