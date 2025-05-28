@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"prodigo/internal/app/models"
-	"prodigo/internal/app/repository/categories"
 	"prodigo/pkg/db/postgres"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
+	"go.uber.org/fx"
 )
 
 type Repository interface {
@@ -23,12 +23,18 @@ type Repository interface {
 
 var ErrNotFound = errors.New("product not found")
 
+type Params struct {
+	fx.In
+
+	Pool postgres.Pool `name:"app_postgres"`
+}
+
 type repository struct {
 	pool postgres.Pool `name:"app_postgres"`
 }
 
-func New(pool postgres.Pool, categoriesRepo categories.Repository) Repository {
-	return &repository{pool: pool}
+func New(p Params) Repository {
+	return &repository{pool: p.Pool}
 }
 
 func (r *repository) CreateProduct(ctx context.Context, p *models.Product) error {

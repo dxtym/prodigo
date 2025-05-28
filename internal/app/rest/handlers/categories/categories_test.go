@@ -250,7 +250,7 @@ func TestHandler_CategoryStatistics(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 		c.Request = httptest.NewRequest(http.MethodGet, "/categories/stats", nil)
 
-		handler.GetCategoryStatistics(c)
+		handler.CategoryStatistics(c)
 
 		assert.Equal(t, http.StatusOK, w.Code)
 		assert.Contains(t, w.Body.String(), "SUV")
@@ -266,7 +266,7 @@ func TestHandler_CategoryStatistics(t *testing.T) {
 		c, _ := gin.CreateTestContext(w)
 		c.Request = httptest.NewRequest(http.MethodGet, "/categories/stats", nil)
 
-		handler.GetCategoryStatistics(c)
+		handler.CategoryStatistics(c)
 
 		assert.Equal(t, http.StatusInternalServerError, w.Code)
 		assert.Contains(t, w.Body.String(), "db error")

@@ -35,6 +35,7 @@ func New(healthHandler *health.Handler, authHandler *auth.Handler) *Server {
 // @title			Prodigo Auth Service
 // @version			1.0
 // @description		This is the auth service for Prodigo.
+
 // @host			localhost:8080
 // @BasePath		/api/v1
 func (s *Server) Start(host, port string) error {
@@ -45,11 +46,11 @@ func (s *Server) Start(host, port string) error {
 	{
 		v1.GET("/health", s.healthHandler.Check)
 
-		auth := v1.Group("/auth")
+		auths := v1.Group("/auth")
 		{
-			auth.POST("/register", s.authHandler.Register)
-			auth.POST("/login", s.authHandler.Login)
-			auth.POST("/refresh", s.authHandler.Refresh)
+			auths.POST("/register", s.authHandler.Register)
+			auths.POST("/login", s.authHandler.Login)
+			auths.POST("/refresh", s.authHandler.Refresh)
 		}
 	}
 

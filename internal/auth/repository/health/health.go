@@ -14,7 +14,7 @@ type Repository interface {
 	Check(context.Context) error
 }
 
-type RepositoryParams struct {
+type Params struct {
 	fx.In
 
 	Pool   postgres.Pool `name:"auth_postgres"`
@@ -26,7 +26,7 @@ type repository struct {
 	client redis.Client  `name:"auth_redis"`
 }
 
-func New(p RepositoryParams) Repository {
+func New(p Params) Repository {
 	return &repository{pool: p.Pool, client: p.Client}
 }
 

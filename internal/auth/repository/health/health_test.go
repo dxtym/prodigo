@@ -71,7 +71,7 @@ func TestRepository_Check(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 
-			repository := health.New(health.RepositoryParams{
+			repository := health.New(health.Params{
 				Pool:   pool,
 				Client: client,
 			})

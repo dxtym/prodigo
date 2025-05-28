@@ -22,6 +22,7 @@ func New(service health.Service) *Handler {
 //	@Summary		Check service health
 //	@Description	Ping the database and cache to verify service health
 //	@Tags			health
+//	@Accept			json
 //	@Produce		json
 //	@Failure		500	{object}	dto.Error
 //	@Success		200	{object}	dto.Response

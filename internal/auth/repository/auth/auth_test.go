@@ -77,7 +77,7 @@ func TestRepository_CreateUser(t *testing.T) {
 				mock.Anything,
 			).Return(tt.want, tt.wantErr).Once()
 
-			repository := auth.New(auth.RepositoryParams{
+			repository := auth.New(auth.Params{
 				Pool:   pool,
 				Client: client,
 			})
@@ -145,7 +145,7 @@ func TestRepository_GetByUsername(t *testing.T) {
 				mock.Anything,
 			).Return(tt.wantErr).Once()
 
-			repository := auth.New(auth.RepositoryParams{
+			repository := auth.New(auth.Params{
 				Pool:   pool,
 				Client: client,
 			})
@@ -231,7 +231,7 @@ func TestRepository_SaveToken(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 
-			repository := auth.New(auth.RepositoryParams{
+			repository := auth.New(auth.Params{
 				Pool:   pool,
 				Client: client,
 			})
@@ -289,7 +289,7 @@ func TestRepository_GetToken(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 			defer cancel()
 
-			repository := auth.New(auth.RepositoryParams{
+			repository := auth.New(auth.Params{
 				Pool:   pool,
 				Client: client,
 			})

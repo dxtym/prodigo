@@ -21,7 +21,7 @@ type Repository interface {
 	GetToken(context.Context, int64) (string, error)
 }
 
-type RepositoryParams struct {
+type Params struct {
 	fx.In
 
 	Pool   db.Pool    `name:"auth_postgres"`
@@ -33,7 +33,7 @@ type repository struct {
 	client rdb.Client
 }
 
-func New(p RepositoryParams) Repository {
+func New(p Params) Repository {
 	return &repository{pool: p.Pool, client: p.Client}
 }
 

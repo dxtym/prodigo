@@ -18,7 +18,7 @@ func TestNew(t *testing.T) {
 
 		repo.On("Exec", mock.Anything, mock.Anything, mock.Anything).
 			Return(pgconn.CommandTag{}, errors.New("cannot create table categories"))
-		pool := New(repo)
+		pool := New(Params{Pool: repo})
 		assert.Nil(t, pool)
 	})
 	t.Run("can run ddl", func(t *testing.T) {
@@ -27,7 +27,7 @@ func TestNew(t *testing.T) {
 
 		repo.On("Exec", mock.Anything, mock.Anything, mock.Anything).
 			Return(pgconn.NewCommandTag("INSERT 1"), nil)
-		pool := New(repo)
+		pool := New(Params{Pool: repo})
 		assert.NotNil(t, pool)
 	})
 }

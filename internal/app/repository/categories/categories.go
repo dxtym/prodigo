@@ -5,6 +5,8 @@ import (
 	"errors"
 	"prodigo/internal/app/models"
 	"prodigo/pkg/db/postgres"
+
+	"go.uber.org/fx"
 )
 
 type Repository interface {
@@ -15,12 +17,18 @@ type Repository interface {
 	CategoryStatistics(ctx context.Context) ([]*models.CategoryStats, error)
 }
 
+type Params struct {
+	fx.In
+
+	Pool postgres.Pool `name:"app_postgres"`
+}
+
 type repository struct {
 	pool postgres.Pool `name:"app_postgres"`
 }
 
-func New(pool postgres.Pool) Repository {
-	return &repository{pool: pool}
+func New(p Params) Repository {
+	return &repository{pool: p.Pool}
 }
 
 func (r *repository) CreateCategory(ctx context.Context, c *models.Category) error {

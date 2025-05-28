@@ -3,7 +3,6 @@ package products
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"io"
 	"net/http"
 	"os"
@@ -11,6 +10,8 @@ import (
 	"prodigo/internal/app/models"
 	"prodigo/internal/app/usecases/products"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
@@ -21,6 +22,21 @@ func New(service products.ServiceInterface) *Handler {
 	return &Handler{service: service}
 }
 
+// CreateProduct godoc
+//
+//	@Summary		Create a new product
+//	@Description	Create a new product with the provided details
+//	@Tags			products
+//
+// @Security	ApiKeyAuth
+//
+//	@Accept			json
+//	@Produce		json
+//	@Param			request	body		models.Product	true	"Product details"
+//	@Failure		400		{object}	map[string]string
+//	@Failure		500		{object}	map[string]string
+//	@Success		201		{object}	map[string]string
+//	@Router			/products/ [post]
 func (h *Handler) CreateProduct(c *gin.Context) {
 	var p models.Product
 	if err := c.ShouldBindJSON(&p); err != nil {
@@ -40,6 +56,24 @@ func (h *Handler) CreateProduct(c *gin.Context) {
 	})
 }
 
+// GetAllProducts godoc
+//
+//	@Summary		Get all products
+//	@Description	Get a list of all products with optional filters
+//	@Tags			products
+//
+// @Security	ApiKeyAuth
+//
+//	@Accept			json
+//	@Produce		json
+//	@Param			category	query		string	false	"Filter by category name"
+//	@Param			status	query		string	false	"Filter by product status"
+//	@Param			price_min	query		int	false	"Minimum price filter"
+//	@Param			price_max	query		int	false	"Maximum price filter"
+//	@Param			search	query		string	false	"Search term for product title"
+//	@Failure		500		{object}	map[string]string
+//	@Success		200		{object}	[]models.Product
+//	@Router			/products/ [get]
 func (h *Handler) GetAllProducts(c *gin.Context) {
 	var fs models.ProductFilterSearch
 	if v := c.Query("category"); v != "" {
@@ -69,6 +103,22 @@ func (h *Handler) GetAllProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, prods)
 }
 
+// GetProductByID godoc
+//
+//	@Summary		Get a product by ID
+//	@Description	Get the details of a product by its ID
+//	@Tags			products
+//
+// @Security	ApiKeyAuth
+//
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int64	true	"Product ID"
+//	@Failure		400	{object}	map[string]string
+//	@Failure		404	{object}	map[string]string
+//	@Failure		500	{object}	map[string]string
+//	@Success		200	{object}	models.Product
+//	@Router			/products/{id} [get]
 func (h *Handler) GetProductByID(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -86,6 +136,23 @@ func (h *Handler) GetProductByID(c *gin.Context) {
 	c.JSON(http.StatusOK, product)
 }
 
+// UpdateProduct godoc
+//
+//	@Summary		Update an existing product
+//	@Description	Update the details of an existing product by ID
+//	@Tags			products
+//
+// @Security	ApiKeyAuth
+//
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int64			true	"Product ID"
+//	@Param			request	body		models.Product	true	"Product details"
+//	@Failure		400		{object}	map[string]string
+//	@Failure		404		{object}	map[string]string
+//	@Failure		500		{object}	map[string]string
+//	@Success		200		{object}	models.Product
+//	@Router			/products/{id} [put]
 func (h *Handler) UpdateProduct(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -114,6 +181,21 @@ func (h *Handler) UpdateProduct(c *gin.Context) {
 
 }
 
+// DeleteProduct godoc
+//
+//	@Summary		Delete a product
+//	@Description	Delete an existing product by ID
+//	@Tags			products
+//
+// @Security	ApiKeyAuth
+//
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int64	true	"Product ID"
+//	@Failure		400	{object}	map[string]string
+//	@Failure		500	{object}	map[string]string
+//	@Success		204	{object}	map[string]string
+//	@Router			/products/{id} [delete]
 func (h *Handler) DeleteProduct(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
@@ -127,15 +209,34 @@ func (h *Handler) DeleteProduct(c *gin.Context) {
 	c.JSON(http.StatusNoContent, gin.H{"message": "product deleted"})
 }
 
+type UpdateStatus struct {
+	Status string `json:"status"`
+}
+
+// UpdateProductStatus godoc
+//
+//	@Summary		Update product status
+//	@Description	Update the status of a product by ID
+//	@Tags			products
+//
+// @Security	ApiKeyAuth
+//
+//	@Accept			json
+//	@Produce		json
+//	@Param			id		path		int64			true	"Product ID"
+//	@Param			request	body		UpdateStatus	true	"Product status"
+//	@Failure		400		{object}	map[string]string
+//	@Failure		404		{object}	map[string]string
+//	@Failure		500		{object}	map[string]string
+//	@Success		200		{object}	map[string]string
+//	@Router			/products/{id}/status [put]
 func (h *Handler) UpdateProductStatus(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
 		return
 	}
-	var payload struct {
-		Status string `json:"status"`
-	}
+	var payload UpdateStatus
 	if err = c.ShouldBindJSON(&payload); err != nil || payload.Status == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid status"})
 		return
@@ -154,6 +255,24 @@ func (h *Handler) UpdateProductStatus(c *gin.Context) {
 
 const uploadDir = "./uploads/products"
 
+// UploadProductImage godoc
+//
+//	@Summary		Upload product image
+//	@Description	Upload an image for a product by ID
+//	@Tags			products
+//
+// @Security	ApiKeyAuth
+//
+//	@Accept			json
+//	@Accept			multipart/form-data
+//	@Produce		json
+//	@Param			id		path		int64	true	"Product ID"
+//	@Param			image	formData	file	true	"Product image file"
+//	@Failure		400		{object}	map[string]string
+//	@Failure		404		{object}	map[string]string
+//	@Failure		500		{object}	map[string]string
+//	@Success		200		{object}	map[string]string
+//	@Router			/products/{id}/image [post]
 func (h *Handler) UploadProductImage(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.ParseInt(idStr, 10, 64)
@@ -238,6 +357,21 @@ func (h *Handler) UploadProductImage(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "image uploaded", "filename": header.Filename})
 }
 
+// GetProductImage godoc
+//
+//	@Summary		Get product image
+//	@Description	Get the image of a product by ID
+//	@Tags			products
+//
+// @Security	ApiKeyAuth
+//
+//	@Accept			json
+//	@Produce		image/jpeg
+//	@Param			id	path		int64	true	"Product ID"
+//	@Success		200	{string}	binary	"Image binary data"
+//	@Failure		400	{object}	map[string]string
+//	@Failure		404	{object}	map[string]string
+//	@Router			/products/{id}/image [get]
 func (h *Handler) GetProductImage(c *gin.Context) {
 	id := c.Param("id")
 	if _, err := strconv.ParseInt(id, 10, 64); err != nil {
@@ -254,6 +388,21 @@ func (h *Handler) GetProductImage(c *gin.Context) {
 	c.File(filePath)
 }
 
+// RestoreProduct godoc
+//
+//	@Summary		Restore a deleted product
+//	@Description	Restore a soft-deleted product by ID
+//	@Tags			products
+//
+// @Security	ApiKeyAuth
+//
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int64	true	"Product ID"
+//	@Failure		400	{object}	map[string]string
+//	@Failure		500	{object}	map[string]string
+//	@Success		200	{object}	map[string]string
+//	@Router			/products/{id}/restore [put]
 func (h *Handler) RestoreProduct(c *gin.Context) {
 	id, err := strconv.ParseInt(c.Param("id"), 10, 64)
 	if err != nil {
