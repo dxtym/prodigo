@@ -2,7 +2,7 @@
 @port = 8000
 @version = api/v1
 @baseUrl = {{host}}:{{port}}/{{version}}
-@accessToken = ACCESS_TOKEN_HERE
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiYXVkIjpbImFkbWluIl0sImV4cCI6MTc0ODQ0MDk3MSwiaWF0IjoxNzQ4NDQwMDcxLCJqdGkiOiI1MGQyYzBhNC1jNzFiLTRkNzQtODg5ZS1kY2NhYzExYTY3ODMifQ.tF9ICnh75C51y2bVnzEm-cNY4-Tkkhct1wzkqmKlcnc
 
 ###
 
@@ -13,6 +13,12 @@ Content-Type: application/json
 {
   "name": "electronics"
 }
+
+###
+
+GET http://{{baseUrl}}/categories/ HTTP/1.1
+Authorization: Bearer {{accessToken}}
+
 
 ###
 
