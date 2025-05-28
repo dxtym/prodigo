@@ -1,18 +1,18 @@
 gcl:
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+	@/snap/bin/go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	$$(which golangci-lint) custom
 
 lint:
 	bin/custom-gcl run ./...
 
 server:
-	go run cmd/$(service)/main.go
+	@/snap/bin/go run cmd/$(service)/main.go
 
 test:
 	mkdir -p data
-	go test -v -covermode=atomic -coverprofile=data/coverage.out ./...
+	@/snap/bin/go test -v -covermode=atomic -coverprofile=data/coverage.out ./...
 	grep -v "mock" data/coverage.out > data/coverage.out.tmp
-	go tool cover -html data/coverage.out.tmp -o data/coverage.html
+	@/snap/bin/go tool cover -html data/coverage.out.tmp -o data/coverage.html
 	open data/coverage.html
 
 up:
