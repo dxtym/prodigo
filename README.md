@@ -32,25 +32,25 @@ go run .\cmd\auth\main.go
 ##API Эндпоинты
 
 ```http
-GET    api/v1/health/            - проверка работоспособности сервиса
-POST   api/v1/auth/register      - регистрация
-POST   api/v1/auth/login         - логин
-POST   api/v1/auth/refresh       - обновление JWT токенов
+GET    api/v1/health/            // проверка работоспособности сервиса
+POST   api/v1/auth/register      // регистрация
+POST   api/v1/auth/login         // логин
+POST   api/v1/auth/refresh       // обновление JWT токенов
 
-POST    api/v1/categories         - добавить категорию 
-GET     api/v1/categories         - Получить все категории
-GET     api/v1/categories/stats   - Получить статистику
-PUT     api/v1/categories/:id     - Изменить категорию
-DELETE  api/v1/categories/:id     - Удалить категорию
+POST    api/v1/categories         // добавить категорию 
+GET     api/v1/categories         // Получить все категории
+GET     api/v1/categories/stats   // Получить статистику
+PUT     api/v1/categories/:id     // Изменить категорию
+DELETE  api/v1/categories/:id     // Удалить категорию
 
-POST    api/v1/products                 - добавить товар
-GET     api/v1/products                 - Получить все товары
-GET     api/v1/products/:id             - Получить товар по ID
-PUT     api/v1/products/:id             - Изменить товар
-DELETE  api/v1/products/:id             - Удалить товар
-PUT     api/v1/products/:id/restore     - Восстановить товар
-PUT     api/v1/products/:id/status      - Изменить статус товара
-POST    api/v1/products/:id/image       - Загрузить изображение товара
-GET     api/v1/products/:id/image       - Получить изображение товара
+POST    api/v1/products                 // добавить товар
+GET     api/v1/products                 // Получить все товары
+GET     api/v1/products/:id             // Получить товар по ID
+PUT     api/v1/products/:id             // Изменить товар
+DELETE  api/v1/products/:id             // Удалить товар
+PUT     api/v1/products/:id/restore     // Восстановить товар
+PUT     api/v1/products/:id/status      // Изменить статус товара
+POST    api/v1/products/:id/image       // Загрузить изображение товара
+GET     api/v1/products/:id/image       // Получить изображение товара
 
 ```
