@@ -2,7 +2,7 @@
 @port = 8000
 @version = api/v1
 @baseUrl = {{host}}:{{port}}/{{version}}
-@accessToken = {{accessToken}}
+@accessToken = ACCESS_TOKEN_HERE
 
 ###
 
@@ -13,12 +13,6 @@ Content-Type: application/json
 {
   "name": "electronics"
 }
-
-###
-
-GET http://{{baseUrl}}/categories/ HTTP/1.1
-Authorization: Bearer {{accessToken}}
-
 
 ###
 
